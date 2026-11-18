@@ -1,4 +1,4 @@
-# CLAUDE-NOTES: rules for agents building kernels in the DSV41 repo
+# Kernel-building rules for the DSV41 repository
 
 > **Origin.** PLI Labs research archive, file `kernel-research/KERNEL-RESEARCH-CLAUDE-NOTES.md`. Published 2026-11-18 in the Volta V100 research
 > repository.
@@ -7,7 +7,7 @@
 > `the owner`). Links to files that are not published were turned into plain text. No figure and no finding
 > was changed. Dates inside the note are its own; later results are in the build pages of this repository.
 
-Terse and binding for kernel lanes on the V100 server (8x V100-SXM2, sm_70, PP2 x TP4, 1Cat vLLM fork, v41k / sm70_turbomind ops) and the Spark rig (GB10, sm_121). Each rule names its source. L-sources are local: `PROF1103/REPORT.md` [L1], `TOK1103/REPORT.md` [L2], `LANES.md` by UTC stamp [L3], code in `V41PKG/wt/combo1103` [L4]. The full report is `KERNEL-RESEARCH/REPORT.md`.
+Terse and binding for kernel lanes on the V100 server (8x V100-SXM2, sm_70, PP2 x TP4, 1Cat vLLM fork, v41k / sm70_turbomind ops); rule 12 covers NVIDIA's DGX Spark (GB10, sm_121). Each rule names its source. L-sources are local: `PROF1103/REPORT.md` [L1], `TOK1103/REPORT.md` [L2], `LANES.md` by UTC stamp [L3], code in `V41PKG/wt/combo1103` [L4]. The full report is `KERNEL-RESEARCH/REPORT.md`.
 
 1. **Size it before you build it.** Compute the speed-of-light time: bytes ÷ ~720 GB/s achievable per V100 (900 GB/s nameplate) for decode, or FLOPs ÷ 125 TFLOPS FP16 for compute-bound work. Convert to ms per round against the 31.1 ms baseline. A saving under ~0.3 ms per round (~1 %) won't be measurable; don't spend a GPU window on it unless it unblocks something larger.
    *Source:* roofline (Williams et al., https://doi.org/10.1145/1498765.1498785); 718.6 GB/s best observed GEMV and the round breakdown [L1].
@@ -53,7 +53,7 @@ Terse and binding for kernel lanes on the V100 server (8x V100-SXM2, sm_70, PP2 
 11. **Communication kernels have hard rules.** Our custom all-reduce path needs size % 16 B == 0 (pad rows) and a fully connected TP group. Use one-shot for small messages and reduce only live data. Cross-GPU flags use `st.release.sys` / `ld.acquire.sys` with per-CTA epochs, and the reduce order is fixed by rank (deterministic, but not NCCL-bitwise).
     *Source:* TOK1103 `index_reduce_live` [L2]; vLLM one-shot vs two-shot (https://github.com/vllm-project/vllm/files/13574639/Latency-optimal.allreduce.and.cuda.graph.optimization.pdf).
 
-12. **The Spark (GB10) is sm_121a, not sm_100a.**
+12. **DGX Spark (GB10) is sm_121a, not sm_100a.**
     - Build with `-gencode=arch=compute_121a,code=sm_121a`; the shorthand reportedly drops the "a".
     - There is no `tcgen05`/TMEM/2-SM MMA: FP4/FP8 run through warp-level block-scaled `mma.sync`.
     - Limits are 99 KB shared per block and 48 warps per SM.

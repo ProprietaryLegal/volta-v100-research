@@ -40,7 +40,7 @@ Port data: the port's teacher-forced logits were **not saved as tensors** — on
 (`[private path]>_<mode>.json`: top-1, top-5, |ΔNLL|, KL lower bound from the
 top-20 prompt logprobs). Per-layer port dumps exist for the p0_smoke run-1 steps (`integ/bringup/dump_pp2/`).
 
-## Result 1 — teacher-forced variants vs the v100-semantic golden (run A, 10:07Z, 507 s on c76e1399)
+## Result 1 — teacher-forced variants vs the v100-semantic golden (run A, 10:07Z, 507 s on one GPU)
 
 Gating golden `<p>__v100-semantic+ownk` (the one the port was gated on). Port = L-INTEG run 2 endpoint reports, own-k
 (gating) entries. KLlb = KL lower bound from the candidate's top-20 (the metric the port was measured with; the exact
@@ -50,7 +50,7 @@ one prefill) / continuation positions (golden = 32 greedy decode steps).
 | prompt (pos) | metric | **ref FP32** (v100-sem numerics, TF) | ref +bf16 stream | ref +bf16 +fp16 inputs | **port** (8×V100) |
 |-|-|-|-|-|-|
 | p0_smoke (37) | top-1 / \|ΔNLL\| / KLlb | 0.946 / 0.022 / 0.0027 | 0.973 / 0.021 / 0.0037 | 0.946 / 0.064 / 0.0133 | 0.973 / 0.039 / 0.0057 |
-| p1_legal (116) | top-1 / \|ΔNLL\| / KLlb | 0.974 / 0.014 / 0.0006 | 0.974 / 0.022 / 0.0016 | 0.983 / 0.018 / 0.0013 | 0.983 / 0.026 / 0.0013 |
+| p1_text (116) | top-1 / \|ΔNLL\| / KLlb | 0.974 / 0.014 / 0.0006 | 0.974 / 0.022 / 0.0016 | 0.983 / 0.018 / 0.0013 | 0.983 / 0.026 / 0.0013 |
 | p2_code (189) | top-1 / \|ΔNLL\| / KLlb | 0.984 / 0.027 / 0.0101 | 0.989 / 0.028 / 0.0056 | 0.989 / 0.024 / 0.0080 | 0.995 / 0.022 / 0.0063 |
 | p3_doc (2077) | top-1 / \|ΔNLL\| / KLlb | 0.990 / 0.027 / 0.0027 | 0.985 / 0.032 / 0.0050 | 0.987 / 0.035 / 0.0036 | 0.984 / 0.033 / 0.0045 |
 | **pooled (2419)** | top-1 / \|ΔNLL\| / KLlb | 0.988 / **0.0263** / 0.0032 | 0.984 / **0.0313** / 0.0049 | 0.987 / **0.0335** / 0.0040 | 0.985 / **0.0320** / 0.0045 |
@@ -129,7 +129,7 @@ Per prompt vs ref-exact (own-k; ref variants on the ref-exact golden's own conti
 | prompt | ref FP32 | +bf16 | +bf16+fp16in | port |
 |-|-|-|-|-|
 | p0_smoke | 1.000 / 0.013 | 1.000 / 0.012 | 1.000 / 0.018 | 1.000 / 0.017 |
-| p1_legal | 0.983 / 0.033 | 0.983 / 0.039 | 0.991 / 0.033 | 0.991 / 0.033 |
+| p1_text | 0.983 / 0.033 | 0.983 / 0.039 | 0.991 / 0.033 | 0.991 / 0.033 |
 | p2_code | 0.979 / 0.049 | 0.963 / 0.042 | 0.979 / 0.030 | 0.963 / 0.052 |
 | p3_doc | 0.980 / 0.048 | 0.980 / 0.048 | 0.976 / 0.047 | 0.980 / 0.044 |
 
@@ -217,4 +217,4 @@ Code (not committed; coordinator commits): `tools/ds41_ref/ref_model.py` (Sequen
 (teacher-forced variant runner, capture + planted-bug options), `tools/ds41_ref/nll_gap.py` (metrics + dump
 localisation). Data: `[private path]` — `tf/` (run A), `tf_B/`, `tf_bug/`, `dump_ref/` (run C),
 `nll_gap_all.json` (every row), `localise_p0.json`, `check_hc.py` (CPU equivalence check vs the port's hc.py),
-`run_tf.sh`, `logs/`. GPU c76e1399 used 09:58–10:34Z only (4 runs: 507 s, 75 s, 986 s, 420 s).
+`run_tf.sh`, `logs/`. One GPU used 09:58–10:34Z only (4 runs: 507 s, 75 s, 986 s, 420 s).

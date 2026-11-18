@@ -9,7 +9,7 @@
 
 This is a metadata watch alongside the three sources required by BRIEF.md, not a replacement for their full inventories. Public GitHub reads only, 2026-11-05. Raw evidence is in `evidence/`.
 
-- 0rand: public repository list captured; all 15 branches of `deepseek-v41-tensorfold-spark` and all 15 branches of `DeepSeek-V4.1-Flash-1017-EXL3-TensorFold-2x-DGX-Spark` examined for commits since 2026-10-28. Only the former's `main-0rand` has new commits in this date window (2), head `a903cb5fe3b4c91b2b17e2a1aaf5dc80a045ced0`; this is the head already reviewed in the owner's SPARKS-RECIPE/REPORT-20261102.md. Recipe default is `pr65-flash17-serving` at `305659970ae63729b0753b27dea85a7ac4b5a93b`. No unreviewed branch update after the last reviewed head was found.
+- 0rand: public repository list captured; all 15 branches of `deepseek-v41-tensorfold-spark` and all 15 branches of `DeepSeek-V4.1-Flash-1017-EXL3-TensorFold-2x-DGX-Spark` examined for commits since 2026-10-28. Only the former's `main-0rand` has new commits in this date window (2), head `a903cb5fe3b4c91b2b17e2a1aaf5dc80a045ced0`; this is the head already reviewed in an earlier private review (2026-11-02). Recipe default is `pr65-flash17-serving` at `305659970ae63729b0753b27dea85a7ac4b5a93b`. No unreviewed branch update after the last reviewed head was found.
 - `jayleaton/deepseek-v41-tensorfold-spark`: 10 main commits since date; source of earlier reviewed batch/row-invariance design, not new Volta kernels. Saved metadata.
 - `ashhart/TensorFold`: 1,450 main commits returned across all pages since date, latest `cde4fe7d9959`; saved complete metadata. Title inventory only here, not a full 1,450-change implementation review.
 - `turboderp-org/exllamav3`: 20 master commits since date, saved metadata.

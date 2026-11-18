@@ -42,11 +42,11 @@ layers, 256 experts, native MXFP4, FP8 GEMMs. FP13 GEMV, MXFP4 direct-order, spa
    UPSTREAM V4-Flash PP5 prose 42.9 -> 48.2 tok/s (+12 %), step 70 -> 63 ms. #1263 (merged): no full-history resend
    under PP (UPSTREAM GLM-5.3 PP5 516K 114.5 -> 96.7 ms/step), V2-runner only. #1267 (merged): device-side top-k/top-p
    row classification. Our PP2 code is in the V1 runner. ESTIMATED +6-10 % once ported.
-   Lane's async note: under PP the AsyncScheduler schedules a request only every pp_size-th step (main: that gate is
+   Lane's async note: under PP the AsyncScheduler schedules a request only every pp_size-th step (coordinator: that gate is
    `use_v2_model_runner` only in async_scheduler.py; the V1-runner async arm is being measured).
 3. **Launch bubbles / fusion.** Not built. 2,089 kernels per round (MEASURED). Upstream #884/#957/#1292 (TP4 AR+norm),
    #1172 mHC (UPSTREAM -5-14 % per op), #1147 router+Q8; KFUS1 P1-P6 measured these on the old engine. ESTIMATED
-   +5-10 % total (main: size from removed kernel time; graphed gaps are ~0.3-1 us).
+   +5-10 % total (coordinator: size from removed kernel time; graphed gaps are ~0.3-1 us).
 4. **Confidence-scheduled DSpark verification.** Config only: dspark_confidence_threshold /
    dspark_max_verification_tokens exist; the drafter has mtp.2.confidence_head. Fewer verify rows -> fewer distinct
    experts. ESTIMATED +0-4 %. Requires synchronous scheduling.

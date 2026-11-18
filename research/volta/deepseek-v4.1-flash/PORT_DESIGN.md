@@ -7,9 +7,8 @@
 > `the owner`). Links to files that are not published were turned into plain text. No figure and no finding
 > was changed. Dates inside the note are its own; later results are in the build pages of this repository.
 
-Lane L-ARCH, 2026-10-07 (UTC). Status: **COMPLETE** (all 8 sections); progress in
-`documents/plans/exec-logs/2026-10-06-ds41/L-ARCH.the progress log`. Scratch (calculator, upstream fetches):
-`[private path]` (`memplan.py` reproduces every byte figure in §6).
+Lane L-ARCH, 2026-10-07 (UTC). Status: **COMPLETE** (all 8 sections); progress log and scratch (calculator,
+upstream fetches) not published (`memplan.py` reproduces every byte figure in §6).
 
 Pinned sources (all `file:line` citations are at these revisions):
 
@@ -21,7 +20,7 @@ Pinned sources (all `file:line` citations are at these revisions):
 
 Citation prefixes: `1C:` = 1Cat path at 2d507837; `up:` = upstream vLLM at b6d8e8af; `ref:` = official
 `inference/` at 2cba9e42 (`m.py` = model.py, `k.py` = kernel.py, `e.py` = engram.py). Inputs used: the plan,
-DECISIONS.md D1–D3, HARDWARE.md, rtx3090box_INVENTORY.md, 1CAT_ARCHAEOLOGY.md, MODEL_ARCHAEOLOGY.md, TENSOR_CENSUS.md
+DECISIONS.md D1–D3, HARDWARE.md, 1CAT_ARCHAEOLOGY.md, MODEL_ARCHAEOLOGY.md, TENSOR_CENSUS.md
 (+json), ENGRAM.md, V4_TO_V41_MODEL_DIFF.md, CHECKPOINT_CANDIDATES.md.
 
 ## 0. Decisions taken in this design (each with its basis; lanes implement these, they do not re-decide)
@@ -94,7 +93,7 @@ P5 = optimisation after correctness.
    requested through the coordinator as a design update to this document (section + exact signature), then made by
    the owner. Cross-lane types live in one frozen file, `common/contracts.py` (§3.1), owned by L-CORE and written
    verbatim from §3 in L-CORE's first commit **C0**; every other lane branches from C0.
-2. **Worktrees:** after L-BUILD finishes, each lane works in `[private path]>` on branch
+2. **Worktrees:** after L-BUILD finishes, each lane works in its own worktree on branch
    `ds41/<lane>` cut from `ds41/sm70-v41` + C0, commits per completed sub-item, parks WIP under `refs/checkpoints/`.
    The coordinator merges in the order C0 → {ATTN, MOE, ENGRAM in any order} → CORE integration. Python-only lanes
    reuse the main tree's compiled extensions (copy `vllm/*.so` and `vllm/**/_*.so` from `[private path]`
@@ -173,8 +172,8 @@ tests/models/deepseek_v41/   each lane owns test_<lane>_*.py; CORE owns conftest
 L-REF lives **outside** 1Cat: `[private path]` (owner L-REF): `ref_model.py` (pure-torch FP32
 port of ref `m.py` semantics, no TileLang), `ref_qat.py` (bit-exact QAT twins), `ref_engram.py` (hash + rows from the
 official shards), `weights.py` (lazy per-layer safetensors reader; MXFP4/FP8 → FP32 on demand), `golden.py` (capture
-CLI), `compare.py` (metrics + gates of §4.5), `prompts/` (deterministic smoke set), `rtx3090box_xcheck.py` (llama.cpp
-cross-check driver, read-only use of the RTX 3090 machine).
+CLI), `compare.py` (metrics + gates of §4.5), `prompts/` (deterministic smoke set), `xcheck.py` (llama.cpp
+cross-check driver).
 
 ### 2.3 Lane scopes (what each lane owns end to end)
 
@@ -184,7 +183,7 @@ cross-check driver, read-only use of the RTX 3090 machine).
 | **L-ATTN** | attention, compressor, indexer, candidate mask, rope, QAT ops, KV specs + page sizes + grouping, SWA/compressed/index-K records, sparse MLA impl, mirror, decode/prefill workspaces | `DeepseekV41Attention` for all four layer modes passing §4.5 per-op gates; mirror ingest/export | C0; L-REF golden vectors |
 | **L-MOE** | router, routed experts (TurboMind MXFP4 shape generalisation, decode path, QPN-M1 re-template later), shared expert, spill partition, decode GEMV fast paths (`sm70/gemv.py`, K=5120), P5 TurboMind g32 dense FP8 | `DeepseekV41MoE` (E=384/top-6 and E=128/top-3) passing bitwise A/B vs dequantised reference; spill partition | C0; L-REF |
 | **L-ENGRAM** | hash + layout, repack tool, row file format, host service (pread pool, pinned staging, async H2D, admission prefetch), Engram module + kernels, Engram `wkv` loading (biased FP16, row-parallel) | repacked row files on `/`; `DeepseekV41Engram` + service passing exact hash/row tests and §4.5 module gates | C0; L-REF (hash/row golden) |
-| **L-REF** | FP32 golden reference, QAT twins, golden capture + compare tooling, prompt set, the RTX 3090 machine cross-check driver, range audit (§4.4) | golden vectors for every op in §4.5 at layers {0,1,2,3,14,20,21,24,28} + full-model short goldens; range audit table | official weights on disk (ds41-pull) |
+| **L-REF** | FP32 golden reference, QAT twins, golden capture + compare tooling, prompt set, the llama.cpp cross-check driver, range audit (§4.4) | golden vectors for every op in §4.5 at layers {0,1,2,3,14,20,21,24,28} + full-model short goldens; range audit table | official weights on disk (ds41-pull) |
 
 ---
 
@@ -702,7 +701,7 @@ Rank r of TP4. "FP16" for FP8 sources = dequantised at load through the fallback
 
 ### 3.8 Golden tensors (L-REF ↔ every lane)
 
-Layout: `[private path]>/manifest.json` + `L{nn}.safetensors` per captured layer +
+Layout: `<golden dir>/manifest.json` + `L{nn}.safetensors` per captured layer +
 `final.safetensors`. `manifest.json`: checkpoint rev, mode (`v100-semantic` = no activation quant, all QAT kept, FP32
 elsewhere — the **primary comparator**; `ref-exact` = also FP8 per-32 activation quant on every quantised GEMM input),
 token ids, positions, layer subset, chunking. Tensor names (FP32 unless noted; per-head tensors only for layers
@@ -734,7 +733,7 @@ tensors; L-CORE owns the hook, each lane names its tensors as above). `compare.p
 Evidence that FP16 range is a real hazard for this family: on DeepSeek-V4-Flash the BOS/attention-sink row's
 residual reaches ~2k at layer 27, 20k at 33, 63.5k at 40 and passes 65,504 from layer 41, while every other token
 stays below ~200; FP16 squares overflowed beyond |x| = 255.9 and inf residuals turned into NaN attention for every
-token with BOS in its window (1Cat PR #658 body, scratch `l-1cat/gh/pr-658.md`; `hc_head` follow-up #715 still open).
+token with BOS in its window (1Cat PR #658 body; `hc_head` follow-up #715 still open).
 V4.1 has the same mHC/sink design (40 layers, hidden 5120), so the contract assumes the same profile until L-REF's
 audit (§4.4) measures it.
 
@@ -868,9 +867,8 @@ of a board read through one PEX 8749 Gen3 x16 uplink (12.87 GB/s measured for 4 
 touched in every layer (≈ 64 tokens/expert), so each chunk streams 10.16 GiB per GPU per stage ≈ 3.4 s/stage/chunk;
 a 32K prompt adds ≈ 54 s. Phase A is the correctness reference, not the speed target.
 
-Host RAM in Phase A: 196.4 GiB − 81.2 pinned − ~24 (8 workers) − ~2 (engine/API) − ~15 (OS, qdrant anon,
-local-law, desktop) ≈ 75 GiB for the page cache, shared by the Engram warm tier and qdrant's 64 GiB mmap
-(coordinator decides whether qdrant stays up during Phase A runs).
+Host RAM in Phase A: 196.4 GiB − 81.2 pinned − ~24 (8 workers) − ~2 (engine/API) − ~15 (OS and other host
+services) ≈ 75 GiB for the page cache, shared by the Engram warm tier and other memory-mapped services.
 
 ### 5.3 Phase B — 12 GPUs, PP3×TP4 [0–13][14–27][28–39], mirror of source 20 on stage 3
 
@@ -1029,9 +1027,9 @@ binds at ≈ (29.19 − 24.99 − 2.60 − 0.06) GiB / 1,920 B ≈ 860K tokens; 
 | pinned expert spill | 81.2 GiB | 0 |
 | worker processes (≈ 3 GiB anon each) | 24 GiB (8) | 36 GiB (12) |
 | engine core + API server | 2 GiB | 2 GiB |
-| OS, qdrant anon, local-law, desktop | ≈ 15 GiB | ≈ 15 GiB |
+| OS and other host services | ≈ 15 GiB | ≈ 15 GiB |
 | Engram pinned staging (3 slots × 4096 × n_layers × 6 × 264 B per process) | < 0.1 GiB | < 0.1 GiB |
-| **left for page cache** (Engram warm tier; qdrant's 64 GiB mmap competes) | **≈ 74 GiB** | **≈ 143 GiB** |
+| **left for page cache** (Engram warm tier; other memory-mapped services compete) | **≈ 74 GiB** | **≈ 143 GiB** |
 
 At 4 KiB of page cache per cached row, 143 GiB holds ≈ 37 M rows (≈ 5 % of the 768 M rows; the locality simulation
 touched 3.06 % of each table over 1.13 M tokens, ENGRAM §5). The FP4 Engram variant (97 GiB fully RAM-resident) fits
@@ -1056,7 +1054,7 @@ integration (L-CORE) can start on `torch` impls while kernels are still being bu
 | day 0 (now; weights still downloading) | **C0**: contracts, topology, knobs, config + registry, quant claim, test scaffolding, import-boundary test | QAT twins (Triton + torch) | MXFP4 contract generalisation + shape tests on synthetic weights | hash + layout (validated against the GGUF metadata constants in ENGRAM §2), repack tool | `ref_qat.py` (exhaustive tests), `ref_engram.py`, `weights.py`, `ref_model.py` |
 | shards land | loader + `skip_checkpoint_weight`, HC, model skeleton on `torch` impls | rope, compressor, window KV, indexer, candidates (`torch` then `sm70`) | router, spill partition, layer tests | run repack → `[private path]`, service, module | golden captures: per-op layers {0,1,2,3,14,20,21,24,25,28}, full-model short goldens, range audit |
 | I0–I2 | PP payload, worker/runner hooks, dump hook | sparse impl, KV specs + grouping, mirror | sm70 decode path | prefetch + latency tests | compare.py runs for every lane |
-| I3–I4 | launch scripts (dev), Phase A/B runs | long-context ladder fixes | QPN-M1 re-template (P5) | Engram stats under load | quality smoke + the RTX 3090 machine cross-check |
+| I3–I4 | launch scripts (dev), Phase A/B runs | long-context ladder fixes | QPN-M1 re-template (P5) | Engram stats under load | quality smoke + the llama.cpp cross-check |
 | P5 | frontend ports, async PP, DSpark, fused HC, custom-AR sizes | packed KV records (≥ 512K) | TurboMind g32 dense FP8 | FP4 Engram variant (quality-gated) | matched GSM8K-64 / HumanEval-32 / LongBench gates |
 
 ### 7.3 Unit tests per lane (all vs L-REF golden, gates §4.5; files `tests/models/deepseek_v41/test_<lane>_*.py`)
@@ -1104,13 +1102,12 @@ on the golden continuation's first 256 tokens (vs `v100-semantic`, gates §4.5);
 (informational); needle retrieval exact. At P4/P5 the 1Cat discipline applies to every optimisation: matched
 GSM8K-64 / HumanEval-32 / LongBench subsets with no aggregate regression (1Cat #283/#344).
 
-Independent cross-check on the RTX 3090 machine (read-only, launches only with coordinator approval since another session uses
-the RTX 3090 machine's GPUs): feed the identical token ids (prompt + our greedy continuation) to `[private path]` with the
-smalinin MXFP4 GGUF once its pull completes, and to `llama-deepseek41-long` (`GGML_CUDA_REFERENCE_F32=1` oracle mode)
+Independent cross-check with llama.cpp: feed the identical token ids (prompt + our greedy continuation) to a llama.cpp build
+with the smalinin MXFP4 GGUF once its pull completes, and to `llama-deepseek41-long` (`GGML_CUDA_REFERENCE_F32=1` oracle mode)
 on the Q4_K_M; compare per-position top-1 / top-5 overlap and PPL (informational: their Engram and expert quantisation
 differ from the official FP8/MXFP4). Exact cross-checks that do not depend on quantisation: Engram row ids vs
 `llama-ds41-dump`, candidate blocks at 25K vs `examples/ds41-dump/check_candidates.py` (which matched the official
-two-level top-k on 917/917 queries, rtx3090box_INVENTORY §3.1).
+two-level top-k on 917/917 queries).
 
 ---
 
@@ -1120,10 +1117,10 @@ two-level top-k on 917/917 queries, rtx3090box_INVENTORY §3.1).
 |-|-|-|-|-|
 | 1 | **FP16 range overflow** (sink/BOS rows; V4 measured 63.5k at layer 40) → inf/NaN or silent clipping | NaN on prompts ≥ 1 token after BOS; §4.4 audit maxima | BF16 stream + FP32 math (A4), FP32 sublayer outputs until the audit clears FP16; no saturating stores; NaN sentinel in dump mode | CORE, REF |
 | 2 | **Silent-wrong V4 semantics** carried into V4.1 (ratio ≤ 1 treated as SWA-only incl. RoPE/YaRN, per-head q-norm, hash routing, `hc_head`) | layers 20–39 stream drift; I0 per-layer gates | separate package (A1) + import-boundary test; per-mode layer tests (0, 2, 3, 20, 21, 24, 25); topology table test | CORE, ATTN |
-| 3 | **Discrete-decision flips** (router top-6, indexer top-512, candidate top-2048) from FP16 activations vs the reference's BF16/FP8 → drift at long context | top-k overlap below gate; long-context needle failures with short-context passes | FP32 scoring everywhere (§4.1); per-op overlap gates; TP-consistency checksum; candidate set equality from golden inputs; the RTX 3090 machine candidate cross-check at 25K | ATTN, MOE, REF |
+| 3 | **Discrete-decision flips** (router top-6, indexer top-512, candidate top-2048) from FP16 activations vs the reference's BF16/FP8 → drift at long context | top-k overlap below gate; long-context needle failures with short-context passes | FP32 scoring everywhere (§4.1); per-op overlap gates; TP-consistency checksum; candidate set equality from golden inputs; the llama.cpp candidate cross-check at 25K | ATTN, MOE, REF |
 | 4 | **KV mirror inconsistency** in PP3 (slots, prefix cache, preemption) → wrong attention only on stage 3, only at long context | PP3 ≠ PP2 on the I2 subset; mirror CRC knob | mirror registered under the source's names so one KV manager drives both copies (§3.5); bitwise I2 gate; CRC debug check; preemption + prefix-cache tests | ATTN, CORE |
 | 5 | **MXFP4 kernel generalisation** (TP4 inter 576 not ×128; QPN-M1 pinned to V4 shapes; TP8 288 breaks skinny `K%64`) → wrong output or slow fallback | per-shape bitwise A/B failures; decode MoE time ≫ V4 | generic TurboMind grouped path first, QPN-M1 off until re-templated; per-shape A/B suite; TP8 benchmark gated on K=288 | MOE |
-| 6 | **Engram miss latency / disk** (root NVMe shared with OS; page cache squeezed by the 81 GiB spill and qdrant's mmap; row file leaves ~44 GB on `/`) → decode stalls, cold prefill seconds | `stats()` p99 gather > 1 ms at T=1; prefill stalls at layer 1/14 | page-packed one-read rows, sub-table sharding, admission prefetch, gathers started before the PP receive; launch guard ≥ 30 GB free on `/`; FP4 RAM-resident variant (quality-gated, Phase B only); coordinator decides qdrant during Phase A | ENGRAM |
+| 6 | **Engram miss latency / disk** (root NVMe shared with OS; page cache squeezed by the 81 GiB spill and other services' mmaps; row file leaves ~44 GB on `/`) → decode stalls, cold prefill seconds | `stats()` p99 gather > 1 ms at T=1; prefill stalls at layer 1/14 | page-packed one-read rows, sub-table sharding, admission prefetch, gathers started before the PP receive; launch guard ≥ 30 GB free on `/`; FP4 RAM-resident variant (quality-gated, Phase B only) | ENGRAM |
 | 7 | **Engram hash/tokenizer mismatch** → every row wrong, output plausible but degraded | row-id mismatch vs golden / `llama-ds41-dump` | assert 99,092 compressed ids + multiplier/prime checksums at startup; tokenizer sha in the row-file header; exact row-id tests | ENGRAM, REF |
 | 8 | **1Cat PP/TP instability** under V4.1 (open #539 custom-AR illegal access at PP2×TP4 startup, #531 stalls with experimental split-K flags, #597 16 tok/s spin-wait and DSML corruption) | startup crash in custom AR; GPUs at 100 % util and < 150 W | sync scheduling (A9), experimental split-K flags off, `--disable-custom-all-reduce` fallback for bring-up, enable optimisations one at a time with A/B; GPU power/util recorded per run | CORE |
 | 9 | **HBM over-commit** (Triton autotune allocations outside the torch allocator — the GLM 0.92 OOM; untiled prefill gathers; 8K-chunk activations) | OOM at first long request or during autotune | 4K chunks until FP8 dense lands; util 0.92 with ≥ 2.5 GiB outside vLLM's budget; every workspace capped by the §6.2 lines; profile-run measurement replaces the estimates | CORE, ATTN |

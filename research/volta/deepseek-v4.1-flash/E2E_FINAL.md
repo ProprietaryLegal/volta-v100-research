@@ -11,7 +11,7 @@ Updated 2026-10-07T17:23:28Z. Build **d73d1616b174aec48787f9cdafc5d349b294539a**
 
 **Campaign complete; overall FAIL.** Teacher-forced gates PASS; exact greedy goldens FAIL; DSpark caps1–5 startup FAIL. Context, concurrency, async equality, PP2 inference and semantic API checks completed. Scope: attention decode OFF only.
 
-Artifacts, full commands, raw SSE/token IDs, request bodies, metrics, full FP32 teacher-forced logits and memory traces: `[private path]`. Checkpoints: `documents/plans/exec-logs/2026-10-06-ds41/E2E-FINAL2.the progress log`.
+Artifacts, full commands, raw SSE/token IDs, request bodies, metrics, full FP32 teacher-forced logits and memory traces: `[private path]`. Checkpoints: a progress log (not published).
 
 ## Method
 
@@ -27,7 +27,7 @@ Live preflight power limits: board A265W, B180W, C238W. A later `clocks.csv` sna
 - v100-semantic+ownk: PASS, positions 2419; |ΔNLL| 0.030941, top1 0.984291, KLlb 0.003790; gates {'NLL': True, 'top1': True, 'KLlb': True}.
 - ref-exact+ownk: PASS, positions 2419; |ΔNLL| 0.047175, top1 0.978090, KLlb 0.010226; gates {'NLL': True, 'top1': True}.
 - p0_smoke: greedy 24/32 exact prefix; FAIL, first mismatch 24.
-- p1_legal: greedy 26/32 exact prefix; FAIL, first mismatch 26.
+- p1_text: greedy 26/32 exact prefix; FAIL, first mismatch 26.
 - p2_code: greedy 24/32 exact prefix; FAIL, first mismatch 24.
 - p3_doc: greedy 18/32 exact prefix; FAIL, first mismatch 18.
 - F p0: 24/32 golden exact prefix; PASS=False.
@@ -58,10 +58,10 @@ Live preflight power limits: board A265W, B180W, C238W. A later `clocks.csv` sna
 
 |Run|Prompt|Decode tok/s|Exact token equality|First mismatch|Acceptance|Accepted tokens/step|
 |---|---|---:|---|---|---:|---:|
-|E_target|p1_legal 32 r0|6.252|baseline|—|None|None|
-|E_target|p1_legal 256 r0|7.767|baseline|—|None|None|
-|E_target|p1_legal 256 r1|7.853|baseline|—|None|None|
-|E_target|p1_legal 256 r2|7.737|baseline|—|None|None|
+|E_target|p1_text 32 r0|6.252|baseline|—|None|None|
+|E_target|p1_text 256 r0|7.767|baseline|—|None|None|
+|E_target|p1_text 256 r1|7.853|baseline|—|None|None|
+|E_target|p1_text 256 r2|7.737|baseline|—|None|None|
 |E_target|p2_code 32 r0|7.500|baseline|—|None|None|
 |E_target|p2_code 256 r0|7.807|baseline|—|None|None|
 |E_target|p2_code 256 r1|7.349|baseline|—|None|None|
@@ -75,7 +75,7 @@ Live preflight power limits: board A265W, B180W, C238W. A later `clocks.csv` sna
 |E3|startup FAIL — see E3.serve.log||||||
 |E4|startup FAIL — see E4.serve.log||||||
 |E5|startup FAIL — see E5.serve.log||||||
-- E_target_p1_legal: 3 completed 256-token repeats, median 7.767 tok/s; repeat equality [{'equal': True, 'first_mismatch': None}, {'equal': True, 'first_mismatch': None}].
+- E_target_p1_text: 3 completed 256-token repeats, median 7.767 tok/s; repeat equality [{'equal': True, 'first_mismatch': None}, {'equal': True, 'first_mismatch': None}].
 - E_target_p2_code: 3 completed 256-token repeats, median 7.574 tok/s; repeat equality [{'equal': True, 'first_mismatch': None}, {'equal': True, 'first_mismatch': None}].
 - E_target_p3_doc: 3 completed 256-token repeats, median 7.144 tok/s; repeat equality [{'equal': True, 'first_mismatch': None}, {'equal': True, 'first_mismatch': None}].
 
@@ -124,7 +124,7 @@ Predecessor E2E-FINAL had attention-ON hang/startup failures. This report tests 
 # Exact greedy failures, attention OFF
 A eager/full-dump/mirror1/util.90/chunk1024. Pooled AM-13-prime/14-prime PASS. All32 tokens received; no hang.
 p0_smoke: FAIL first mismatch zero-based24, target token5512, own-k golden token15225. Exact request [...]/A_p0_smoke.json.request.json, command campaign.log.
-p1_legal: FAIL first mismatch zero-based26, target token418, own-k golden token305. Exact request [...]/A_p1_legal.json.request.json, command campaign.log.
+p1_text: FAIL first mismatch zero-based26, target token418, own-k golden token305. Exact request [...]/A_p1_text.json.request.json, command campaign.log.
 p2_code: FAIL first mismatch zero-based24, target token0, own-k golden token38. Exact request [...]/A_p2_code.json.request.json, command campaign.log.
 p3_doc: FAIL first mismatch zero-based18, target token1522, own-k golden token58782. Exact request [...]/A_p3_doc.json.request.json, command campaign.log.
 Component: end-to-end greedy numeric path, before divergence sequences agree; no API/token extraction error (full returned IDs and raw dump exist). Changes since previous validated PP3 include g32 dense, fused HC/MoE, COMM. The pooled gate tolerates close-distribution token flips; no single kernel attribution is established without controlled ablations. Attention decode OFF disproves that new decode kernel as a necessary cause. No code fix permitted/performed.
@@ -134,7 +134,7 @@ First mismatch logits saved in A_first_mismatch_logits.json. Every returned mism
 
 ## DSpark PP3 startup failure (E1–E5)
 Root assertion kv_cache_utils.py:3112, before KV initialization/health. Failing component: V4.1 DSpark draft cache namespace across PP workers. llm_base_proposer.py:_get_model calls get_model without a prefix; get_model defaults prefix empty; DSparkV41DraftModel makes model.layers.0/1/2.attn.swa_cache on the LAST stage (draft SWA window133). Those names already identify BACKBONE layers0/1/2 on the FIRST stage (window128). Global per-worker cache merge therefore compares unequal dataclasses for identical names. The local duplicate guard misses this because they are on different PP stages. V4 DSpark uses prefix layers.{num_hidden_layers+stage}, i.e.40..42, avoiding this collision.
-Primary source anchors: sm70/dspark.py:185,380,426; llm_base_proposer.py:2137; model_loader/__init__.py:133; kv_cache_utils.py:3112. CPU dataclass merge reproduction (not a full-server run): CUDA_VISIBLE_DEVICES='' [private path] [...]/spec_cache_repro.py ; exit1 with SAME assertion, full evidence spec_cache_repro.log. Full E1 env/resolved command and runtime stack E1.serve.log. No code fixed; owner should make draft cache names distinct (as V4 does) before rerun. All speculative legal/code parity, acceptance and throughput UNMEASURED, not0.
+Primary source anchors: sm70/dspark.py:185,380,426; llm_base_proposer.py:2137; model_loader/__init__.py:133; kv_cache_utils.py:3112. CPU dataclass merge reproduction (not a full-server run): CUDA_VISIBLE_DEVICES='' [private path] [...]/spec_cache_repro.py ; exit1 with SAME assertion, full evidence spec_cache_repro.log. Full E1 env/resolved command and runtime stack E1.serve.log. No code fixed; owner should make draft cache names distinct (as V4 does) before rerun. All speculative text/code parity, acceptance and throughput UNMEASURED, not0.
 
 All five caps separately reproduced the identical root assertion before health: E1 16:40:03Z, E2 16:48:53Z, E3 16:54:23Z, E4 16:59:54Z, E5 17:05:04Z (controller observation times). Exact inherited env, UUID mapping, launcher command and stack are preserved separately in E1.serve.log through E5.serve.log. Subsequent NCCL connection-closed / worker-died messages are shutdown consequences. Every server was stopped and GPU idleness checked before the next. All speculative p1/p2/p3 parity, acceptance, accepted tokens/step and throughput are unmeasured for every cap.
 

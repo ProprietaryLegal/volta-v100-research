@@ -134,7 +134,7 @@ caching hits (no recomputation), so the steady state is dominated by new tokens.
 **the V100 server's disks (measured by L-INV, HARDWARE.md §A.5):** `[private path]` (DRAM-less Realtek RTS5772DL, 126 media
 errors) under the concurrent download: 4 KiB random reads QD1 p50 0.75 ms / mean 2.1 ms / p99 14 ms, **QD32 only
 7.3 k IOPS**; root NVMe (Phison E18 with DRAM, 254 GB free): **QD1 p50 74 µs, QD32 219 k IOPS**. Page cache: 196.4 GiB
-RAM, of which qdrant's mmap holds ~64 GiB.
+RAM, of which another service's mmap holds ~64 GiB.
 
 At decode that is ~48 × 0.45 ≈ 22 row misses per token. JigSawPT (RTX 5090 + PCIe-5 NVMe, Windows, mmap'd tables)
 measured 16.5 µs/row at queue depth 8 after making the 48 reads asynchronous (10.4 ms → 0.92 ms per token, "11.4×,

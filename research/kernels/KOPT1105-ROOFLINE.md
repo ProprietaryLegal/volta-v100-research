@@ -21,8 +21,7 @@ The strongest new finding is a tuning-coverage gap. The selected tile is M64/N12
 Run from this directory:
 
 ```bash
-source [...]/paths.sh
-"$HARNESS_PYTHON" derive_roofline.py
+python3 derive_roofline.py
 ```
 
 The census contains tokens7,2616,8188,8192; layers0–39; ranks0–3. GU is `(N,K)=(1152,5120)`; DN is `(1280,2304)`. Descriptor M is the larger output allocation, **not the sum of the32 bank-local expert counts**. Use the latter for useful FLOPs. Source `check/capture.py:25–31` establishes geometry and validates the bank-local counts.

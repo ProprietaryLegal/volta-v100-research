@@ -7,7 +7,7 @@
 > `the owner`). Links to files that are not published were turned into plain text. No figure and no finding
 > was changed. Dates inside the note are its own; later results are in the build pages of this repository.
 
-Status: COMPLETE (2026-10-06, lane L-1CAT; progress file `documents/plans/exec-logs/2026-10-06-ds41/L-1CAT.the progress log`).
+Status: COMPLETE (2026-10-06, lane L-1CAT; progress file not published).
 Sections are numbered as in the brief and appear in the order they were written (1, 7, 8, 2, 4, 5, 6, 3, 9).
 
 **Key findings for the port (details in the cited sections):**
@@ -241,7 +241,7 @@ All target SM90/SM100/SM120/AMD/NPU; none target SM70.
 
 ### 8.1 `[private path]` (production GLM tree; read-only inspection)
 
-Branch `codex/glm53-sm70-source-audit`, HEAD `00193c04` (2026-09-30); `origin` is a blob-less
+A local source-audit branch, HEAD `00193c04` (2026-09-30); `origin` is a blob-less
 partial clone (only `git log`/working-tree reads were used, so no lazy fetch touched it).
 `d743d0c9` merged 1Cat main `2c8b9baa` (2026-09-30 00:24 +0800) for the 09-29 venv upgrade.
 Local-only commits (`git log origin/main..HEAD`, 12 non-merge) and whether 1Cat
@@ -265,7 +265,7 @@ engine fixes that 1Cat main still lacks.
 
 | Lesson | Source | Bearing on DS-V4.1 |
 |-|-|-|
-| On the V100 server (cross-board PCIe ~5 GB/s), GLM-5.3 B1 decode was **faster as TP8×PP1 than TP4×PP2** (+20–28% decode, ≈4× prefill; legal-prose 67.6 vs 56.9 tok/s) because the single-sequence PP bubble cost more than the PCIe all-reduce hop | `docs/models/glm-5.3-flash/ONECAT_LAUNCH_20260917.md:207-219` (experiment D) | Do not assume PP×TP4 beats TP8 on the V100 server; 1Cat's own DS-V4 numbers (TP8 65.1 vs PP2×TP4 73.6 tok/s) were taken on a DGX-1 hybrid cube-mesh where the cross-island pairs also have NVLink (issue #597 describes that topology) — the V100 server's boards have **no** NVLink between them. Benchmark both. But see §9: MLA KV is replicated per TP rank (issue #597 measured TP8 could not hold 16K context at 0.85 util), and V4.1's kv-sharing groups restrict PP cuts. |
+| On the V100 server (cross-board PCIe ~5 GB/s), GLM-5.3 B1 decode was **faster as TP8×PP1 than TP4×PP2** (+20–28% decode, ≈4× prefill; prose 67.6 vs 56.9 tok/s) because the single-sequence PP bubble cost more than the PCIe all-reduce hop | `docs/models/glm-5.3-flash/ONECAT_LAUNCH_20260917.md:207-219` (experiment D) | Do not assume PP×TP4 beats TP8 on the V100 server; 1Cat's own DS-V4 numbers (TP8 65.1 vs PP2×TP4 73.6 tok/s) were taken on a DGX-1 hybrid cube-mesh where the cross-island pairs also have NVLink (issue #597 describes that topology) — the V100 server's boards have **no** NVLink between them. Benchmark both. But see §9: MLA KV is replicated per TP rank (issue #597 measured TP8 could not hold 16K context at 0.85 util), and V4.1's kv-sharing groups restrict PP cuts. |
 | 1Cat GLM PP2×TP4 first request OOM'd at `--gpu-memory-utilization 0.92` inside a Triton autotuner that allocates outside the torch allocator; `0.90` + `VLLM_PP_LAYER_PARTITION=24,21` fixed it | `ONECAT_LAUNCH_20260917.md:63-90` | V4.1 Triton kernels (indexer, sparse MLA, Engram lookup) autotune/allocate similarly; budget ≥2 GiB/GPU headroom; use `VLLM_PP_LAYER_PARTITION` (respecting kv-sharing cut points, §9) |
 | GLM TP4 (v100-skinny overlay) failed a fixed endpoint budget (final-logit rel-RMS 0.041 vs 0.0047 for TP2) and FP32 collective accumulation alone did not fix it; a matched CPU TP4 oracle passed, so the failure was partition-matched GPU numerics upstream of the head | `docs/models/glm-5.3-flash/TP4_NUMERICAL_DIAGNOSTICS.md:1-60`, `the progress log:1020-1030` | Expect TP-layout-dependent FP16 drift; validate V4.1 against a **partition-matched** reference (same TP slicing) and use token-local, not only aggregate, metrics. 1Cat's own policy is the same: greedy identity is not a gate, matched GSM8K/HumanEval/LongBench are (#283, #344) |
 | Ordered grouped-MoE combine (ascending expert id, separate FP32 mul/add, shared expert added before the single FP16 rounding) was built and passed exact-oracle tests | `the progress log:1054-1118`; `docs/runtime/v100-skinny/ordered-combine/probe-20260917T054458Z/` | 1Cat's MXFP4 path already keeps "routing, quantization, accumulation order" bitwise (#160/#164/#181/#308: top-6 direct-order + half2 reducer, bitwise vs reference); V4.1's top-6 keeps that contract, but the 384-expert/2304-inter shapes need the same bitwise A/B before admitting the fast paths |

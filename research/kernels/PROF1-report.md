@@ -8,8 +8,7 @@
 > was changed. Dates inside the note are its own; later results are in the build pages of this repository.
 
 One profiled boot
-(the V100 server top10/PROF1; traces top10/PROF1/traces/<cell>/, 8 ranks each; parser $C/PROF1/parse_traces.py; tables
-$C/PROF1/out/). Clocks 1425 MHz cap, 180 W. Greedy, short synthetic essay prompt (39 tokens), 512 output tokens.
+(the V100 server top10/PROF1; traces top10/PROF1/traces/<cell>/, 8 ranks each; parser and tables in a private campaign folder). Clocks 1425 MHz cap, 180 W. Greedy, short synthetic essay prompt (39 tokens), 512 output tokens.
 
 ## Cell c1-short (one stream)
 | | profiled | plain (same boot) |
@@ -54,5 +53,4 @@ Kernel launches per step (top-98 rows of the key-averages table, so a lower boun
 Reading (owner): at 3 streams, stage 0's all-reduce bucket grows from 3.7 to 29.2 ms/step while its MoE grows 5.8 -> 16.0.
 The all-reduce time is most likely spin-wait inside the custom push all-reduce (ranks arriving at different times), not
 link time; KDEC should check per-rank arrival skew. The c1-32k windows include the 26K prefill, so they are not clean
-decode numbers (pp_hop 67 ms on stage 0 is prefill hand-off). Parser: $C/PROF1/parse_traces.py; tables
-$C/PROF1/out/{c3-short,c1-32k}-r{0,4}.md.
+decode numbers (pp_hop 67 ms on stage 0 is prefill hand-off). Parser and tables in a private campaign folder.

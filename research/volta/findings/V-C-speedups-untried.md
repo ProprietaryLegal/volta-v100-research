@@ -8,15 +8,15 @@
 > was changed. Dates inside the note are its own; later results are in the build pages of this repository.
 
 **Scope:** every concrete way to make *inference faster* on a multi-board Tesla V100-SXM2-32GB server
-(sm_70 / Volta), with emphasis on **options NOT YET TRIED** on this fleet. Decode-tok/s
-focused (the legal-drafting workload is single-stream, `max_num_seqs=1`, long context).
+(sm_70 / Volta), with emphasis on **options NOT YET TRIED** on this server. Decode-tok/s
+focused (the target workload is single-stream, `max_num_seqs=1`, long context).
 Research-first and adversarial: marketing tok/s are distrusted, and every technique that
 silently needs sm_80+ is flagged as a non-starter on Volta.
 
 **Method / provenance.** Findings combine (a) **on-box inspection** of the installed
-`1Cat-vLLM-1.0.0` conda env and the `[private path]` benchmark harness (ground
+`1Cat-vLLM-1.0.0` conda env and a private benchmark setup (ground
 truth), (b) two parallel deep-web research lanes (spec-decode/quant; attention/MoE/serving),
-and (c) memory/LESSONS_LEARNED corroboration. Per the eval-provenance rule, **no number
+and (c) corroboration from internal notes. Per the eval-provenance rule, **no number
 here is decision-grade until re-measured on our own box with `/v1/models` verified** — most
 public numbers are A100/H100 (sm_80+) and are labelled **(NOT V100)**. Confidence is per
 claim (high / med / low).
@@ -52,7 +52,7 @@ the spec-decode path; the only `capability` checks are for multimodal/M-RoPE, no
 machinery is present and arch-agnostic on the proposer side — the question is which method is
 *correct* and *fast* for our models.
 
-### MTP (built-in multi-token-prediction heads) — the winner for this fleet
+### MTP (built-in multi-token-prediction heads) — the winner for this server
 - **Qwen3.5/3.6 ship MTP weights inside the checkpoint** (no separate draft file). vLLM's
   official Qwen3.5 recipe enables it with
   `--speculative-config '{"method":"mtp","num_speculative_tokens":N}'` and recommends **MTP-1
@@ -79,8 +79,8 @@ machinery is present and arch-agnostic on the proposer side — the question is 
 ### n-gram / prompt-lookup (`method: ngram`)
 - Draft-model-free; the proposer is table-lookup against the prompt/history, **no quant/attention
   tensor-core kernels → arch-independent, runs on sm_70.** **Confidence: high.**
-- Canonical gain up to **~2.8× at QPS=1 on summarization** (Llama-3-70B/4×H100) — legal drafting
-  is similarly repetitive (boilerplate, repeated party names, quoted record, caption/jurat), so a
+- Canonical gain up to **~2.8× at QPS=1 on summarization** (Llama-3-70B/4×H100) — long-document
+  drafting is similarly repetitive (boilerplate, repeated names, quoted source text), so a
   **1.5–2.5×** band is plausible; the *acceptance* transfers, the absolute tok/s does not.
   **Confidence: med.** [vLLM spec-decode blog](https://blog.vllm.ai/2024/10/17/spec-decode.html).
 - **⚠️ Unsafe on Qwen3.5/3.6 (GDN) per #39273 — use ONLY on the 122B full-attention target.**
@@ -91,7 +91,7 @@ machinery is present and arch-agnostic on the proposer side — the question is 
   generations, frequency-weighted, adaptive depth; on-box `suffix_decoding_max_tree_depth=24`).
   CPU proposer (~20 µs/token) → **arch-independent, runs on sm_70.** **Confidence: high.**
 - Reported **2.3×–6.3× decode-time reduction** (1.4×–3.9× faster than vLLM ngram) on
-  high-repetition workloads; legal drafting likely lands at the lower end. **Confidence: med**
+  high-repetition workloads; document drafting likely lands at the lower end. **Confidence: med**
   (vendor numbers, mixed HW).
   [Snowflake/Arctic](https://www.snowflake.com/en/engineering-blog/suffixdecoding-arctic-inference-vllm/).
 - **⚠️ Same GDN "propose-N / partial-accept" pattern as ngram → almost certainly hits the #39273
@@ -131,12 +131,12 @@ machinery is present and arch-agnostic on the proposer side — the question is 
   *experimental/research*. Promising long-term, **not production on V100 today.** **Confidence: med
   (low for V100).** [kaitchup DFlash](https://kaitchup.substack.com/p/dflash-for-qwen35-eagle-for-gemma).
 
-### Ranking — single-stream (`max_num_seqs=1`) legal drafting
+### Ranking — single-stream (`max_num_seqs=1`) document drafting
 
 | Rank | Method | sm_70? | Safe on 3.5/3.6-GDN? | Expected decode × (batch=1, V100) | Conf |
 |---|---|---|---|---|---|
 | **1** | **MTP** (built-in head) | **Yes — fork-validated** | **Yes (decoupled)** | **~1.7–2.2×** | high |
-| 2 | ngram (prompt-lookup) | Yes (kernel-free) | **No** — ✅ 122B full-attn only | ~1.5–2.5× on repetitive legal text | med |
+| 2 | ngram (prompt-lookup) | Yes (kernel-free) | **No** — ✅ 122B full-attn only | ~1.5–2.5× on repetitive text | med |
 | 3 | suffix (Arctic) | Yes (CPU proposer) | Likely unsafe — ✅ 122B only | ~1.5–3× on repetitive | med |
 | 4 | EAGLE3 | Partial (chain not tree) | No head for our models | ~1.4–1.9× (Qwen3 proxy) | med |
 | 5 | draft-model | Yes (force non-FlashInfer) | n/a | ~1.2–2× (weak for MoE) | low-med |
@@ -182,7 +182,7 @@ naming/repack artifact; the kernel executing on Volta is the TurboMind sm_70 pat
 - For memory-bandwidth-bound batch=1 decode, **4-bit weight-only is the throughput king**: ¼ the
   weight bytes per token, dequantized into V100 FP16 tensor cores. Our own measured numbers
   corroborate the *relative* win: **35B-A3B-AWQ ≈ 121 tok/s vs ≈ 82 GGUF (+48%)**, **122B-A10B-AWQ
-  ≈ 77 (+41%)**, **27B ≈ 81** (memory: `onecat_vllm_v100_awq`). **Confidence: high** on our numbers;
+  ≈ 77 (+41%)**, **27B ≈ 81**. **Confidence: high** on our numbers;
   external V100 MoE-AWQ tok/s benchmarks are scarce (see gap note).
 
 ### KV-cache quant for speed/quality (llama.cpp lane)
@@ -262,7 +262,7 @@ placement** decision, and **CPU expert-offload** to serve bigger MoEs than HBM a
   [vLLM #17619](https://github.com/vllm-project/vllm/issues/17619),
   [vllm-moe-configs](https://github.com/MissionSquad/vllm-moe-configs).
 
-### Expert parallelism (EP) — do NOT enable on this fleet
+### Expert parallelism (EP) — do NOT enable on this server
 - vLLM's EP all-to-all without NVLink/DeepEP falls to a **"naive" backend the project calls "not
   suitable for production"**; optimized EP backends **require NVLink or InfiniBand**, and "systems
   without P2P connectivity will perform extremely poorly." Our cross-board fabric is **PCIe Gen3 x8
@@ -281,7 +281,7 @@ placement** decision, and **CPU expert-offload** to serve bigger MoEs than HBM a
   attention/KV/router/shared-expert). **DDR5-12ch (~460 GB/s) vs DDR4-8ch (~200 GB/s) ≈ 2× — the
   decisive variable.** **Confidence: high.**
 - **Mainline llama.cpp `-ot`/`--n-cpu-moe` is the most realistic V100 offload path** (builds and runs
-  on Volta; our harness already runs sm_70 `-fa`/`-sm tensor` builds). Pattern:
+  on Volta; our benchmark setup already runs sm_70 `-fa`/`-sm tensor` builds). Pattern:
   `-ot "\.ffn_.*_exps\.=CPU"` (keep attention+shared on GPU, push expert FFN to CPU) or `--n-cpu-moe N`.
   Proxies (NOT V100): gpt-oss-120B MXFP4 on RTX-4080 16 GB, 78% CPU offload **12.45 t/s**; EPYC-only
   DeepSeek 671B Q4 **3.4–9.7 t/s** (NUMA-pinned higher). **Confidence: high it works; med on numbers.**
@@ -369,13 +369,13 @@ V100 data — re-measure):** ~120B-A5B (gpt-oss) **~12–22 t/s** (DDR5) / ~6–
 
 ---
 
-## 6. The "haven't-been-tried" experiment list for THIS fleet — ranked by upside ÷ effort
+## 6. The "haven't-been-tried" experiment list for THIS server — ranked by upside ÷ effort
 
 Anchors today (verified on-box, but **note provenance**): the `1cat-bench` numbers
-(35B-A3B-AWQ **121 tok/s**, 122B-A10B-AWQ **77**, 27B **81**) were captured on **the RTX 3090 machine's V100-PCIe pair,
-TP2** (`launch_27b/35b.sh` → `CUDA_VISIBLE_DEVICES=1,2`, `--tensor-parallel-size 2`), *not* a the V100 server
-4-card board. The task brief calls these "the V100 server TP4" anchors. **Action E0 below: re-measure on a the V100 server
-NVLink quad with `/v1/models` verified to settle the discrepancy before attributing any speedup.**
+(35B-A3B-AWQ **121 tok/s**, 122B-A10B-AWQ **77**, 27B **81**) were captured on **another machine,
+TP2** (`launch_27b/35b.sh` → `CUDA_VISIBLE_DEVICES=1,2`, `--tensor-parallel-size 2`), *not* a 4-card board of the V100
+server. The task brief calls these "the V100 server TP4" anchors. **Action E0 below: re-measure on an NVLink quad of the
+V100 server with `/v1/models` verified to settle the discrepancy before attributing any speedup.**
 
 | # | Experiment | Lane | Expected upside (batch=1 decode) | Effort | Conf | Risk / gate |
 |---|---|---|---|---|---|---|
@@ -390,7 +390,7 @@ NVLink quad with `/v1/models` verified to settle the discrepancy before attribut
 | **E9** | **CPU expert-offload** of a 120B–235B MoE via mainline llama.cpp `-ot`/`--n-cpu-moe`, NUMA-pinned | llama.cpp | serve **bigger** MoE at ~9–15 t/s | Med | high(works)/med(num) | gated by EPYC DDR bandwidth |
 | **E10** | **ik_llama.cpp ≥ PR #1785** for CPU+GPU MoE offload A/B vs mainline | ik_llama | often **faster** than mainline on V100 | Med | high(V100 data) | unofficial on Volta; `--split-mode graph` |
 | **E11** | **EAGLE3 on 122B** using the lmsys/nvidia 235B-A22B head as a proxy | vLLM | ~1.4–1.9× *if* it loads | Med-high | low-med | no exact head; chain-not-tree on Volta |
-| **E12** | **Multi-LoRA smoke test** on V100 (rank-matched adapter) | vLLM | enables per-matter adapters | Low | med | Triton-FMA; may silent-ignore |
+| **E12** | **Multi-LoRA smoke test** on V100 (rank-matched adapter) | vLLM | enables per-task adapters | Low | med | Triton-FMA; may silent-ignore |
 | ✗ | EP / DeepEP / Marlin / INT8-W8A8 / native-FP8 / FlashInfer / TRITON_ATTN / NVLS | — | **none on Volta** | — | high | see kill-list |
 
 **Top 3 to run first (highest upside ÷ effort, all on the existing 1Cat-vLLM lane):** **E1 (MTP)**,
@@ -432,7 +432,7 @@ first so the multipliers are measured against the correct v100server-TP4 baselin
   max-num-seqs, MoE-with-offload, or MoE-AWQ generally. Every concrete multiplier above **transfers
   mechanistically from newer cards** — decision-grade numbers must come from A/B-ing on our own box
   (eval-provenance rule: verify `/v1/models`, record endpoint/SHA/params/seed).
-- **Provenance discrepancy (E0):** the existing anchors are **the RTX 3090 machine TP2**, not **the V100 server TP4** — re-measure.
+- **Provenance discrepancy (E0):** the existing anchors are **another machine's TP2**, not **the V100 server TP4** — re-measure.
 - **GDN-safety of `suffix`** is unconfirmed (likely shares the ngram #39273 bug on 3.5/3.6).
 - **No EAGLE/MTP head for the exact 122B variant** we serve (235B-A22B head is the closest proxy).
 - **No on-record multi-LoRA-on-V100 confirmation** post-Punica-removal — code wall gone, smoke test required.
@@ -458,5 +458,5 @@ first so the multipliers are measured against the correct v100server-TP4 baselin
 - ik_llama V100: https://github.com/ikawrakow/ik_llama.cpp/pull/1785 • https://github.com/ikawrakow/ik_llama.cpp/pull/875
 - DeepEP sm_90: https://github.com/deepseek-ai/DeepEP • vLLM sm_70 drop @0.20: https://discuss.vllm.ai/t/support-for-v100-sm-70-on-vllm-0-20/2605
 
-*Compiled 2026-06-13 for `[private path]`. No system changes made; on-box facts inspected
-read-only. Re-measure every multiplier on a the V100 server TP4 NVLink quad before relying on it.*
+*Compiled 2026-06-13. No system changes made; on-box facts inspected
+read-only. Re-measure every multiplier on a TP4 NVLink quad of the V100 server before relying on it.*

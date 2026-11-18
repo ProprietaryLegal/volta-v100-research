@@ -26,8 +26,8 @@ Data: 10 runs (prompts x modes x index-K variants), every prefill token and 31 g
 |-|-|-|-|-|
 | p0_smoke | ref-exact | 6 | 31 | False |
 | p0_smoke | v100-semantic | 6 | 31 | False |
-| p1_legal | ref-exact | 85 | 31 | False |
-| p1_legal | v100-semantic | 85 | 31 | False |
+| p1_text | ref-exact | 85 | 31 | False |
+| p1_text | v100-semantic | 85 | 31 | False |
 | p2_code | ref-exact | 158 | 31 | False |
 | p2_code | v100-semantic | 158 | 31 | False |
 | p3_doc | ref-exact+ownk | 2046 | 31 | False |
@@ -91,7 +91,7 @@ Overall maxima (layer, prompt:token position):
 - `attn.o`: **36** at layer 39 (p2_code:77)
 - `attn.out`: **484** at layer 39 (p3_doc:430)
 - `attn.out_tp4_partial`: **355** at layer 39 (p3_doc:430)
-- `attn.qk_logit`: **102** at layer 39 (p1_legal:0)
+- `attn.qk_logit`: **102** at layer 39 (p1_text:0)
 - `moe.expert_out_max`: **2.202e+04** at layer 28 (p0_smoke:0)
 - `moe.expert_out_unweighted_max`: **1.474e+04** at layer 28 (p3_doc:0)
 - `moe.shared_out`: **2.82e+03** at layer 39 (p2_code:75)
@@ -239,14 +239,14 @@ Overall maxima (layer, prompt:token position):
 - `attn.o`: **36** at layer 39 (p2_code:77)
 - `attn.out`: **441** at layer 39 (p3_doc:428)
 - `attn.out_tp4_partial`: **365** at layer 39 (p3_doc:428)
-- `attn.qk_logit`: **102** at layer 39 (p1_legal:0)
+- `attn.qk_logit`: **102** at layer 39 (p1_text:0)
 - `moe.expert_out_max`: **2.243e+04** at layer 28 (p2_code:0)
 - `moe.expert_out_unweighted_max`: **1.502e+04** at layer 28 (p2_code:0)
 - `moe.shared_out`: **2.89e+03** at layer 39 (p2_code:88)
 - `moe.combine_f32`: **2.283e+04** at layer 28 (p2_code:186)
 - `moe.out_tp4_partial`: **5.97e+03** at layer 28 (p2_code:186)
 - `engram.wkv_out`: **224** at layer 14 (p3_doc:726)
-- `engram.gate_add`: **13.9** at layer 14 (p1_legal:0)
+- `engram.gate_add`: **13.9** at layer 14 (p1_text:0)
 - `idx.score`: **7.24** at layer 8 (p3_doc:1521)
 
 ### v100-semantic: §4.4 rules

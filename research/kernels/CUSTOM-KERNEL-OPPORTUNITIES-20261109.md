@@ -7,7 +7,7 @@
 > `the owner`). Links to files that are not published were turned into plain text. No figure and no finding
 > was changed. Dates inside the note are its own; later results are in the build pages of this repository.
 
-Date: 2026-11-09. For the owner. Build: NVIDIA's DeepSeek-V4.1-Flash-1017 NVFP4 pack on the V100 server's eight V100 cards, port 18043.
+Date: 2026-11-09. Build: NVIDIA's DeepSeek-V4.1-Flash-1017 NVFP4 pack on the V100 server's eight V100 cards, port 18043.
 
 A kernel is a small program that runs on the graphics card. One pass of the model runs about two thousand of
 them. A custom kernel is one written for our cards and our weight format instead of a general one.
@@ -31,20 +31,19 @@ Every statement about what a kernel does is a reading of its code. The source ma
 Two phases matter. Prefill is the model reading the prompt. Decode is the model writing the answer, in rounds:
 each round checks up to six tokens at once and keeps about three.
 
-| Quantity | This build | Production, same day | Label |
-|---|---|---|---|
-| Decode, legal-style text | 82 to 88 ms per round | 21.5 ms per round | MEASURED, `logs/baseline/nvfp4-final-l1-tput.out`, `prod1109-l1-tput.out` |
-| Prefill speed, about 105,000 tokens | 1,441 tokens per second | 2,789 tokens per second | MEASURED, `nvfp4-final-long100k.out`, `prod1109-measure.out` |
-| Your usual request (216,000-token prompt, thinking on, 300 tokens out): wait before the first token | 134 to 140 s | 75 to 78 s | MEASURED, `nvfp4-final-harness-think1.jsonl`, `prod1109-measure.out` |
-| Same request: time spent writing | 7 to 10 s | 2.6 to 3.5 s | MEASURED, same files |
+| Quantity | This build | Label |
+|---|---|---|
+| Decode, document-style text | 82 to 88 ms per round | MEASURED, `logs/baseline/nvfp4-final-l1-tput.out` |
+| Prefill speed, about 105,000 tokens | 1,441 tokens per second | MEASURED, `nvfp4-final-long100k.out` |
+| A 216,000-token prompt (thinking on, 300 tokens out): wait before the first token | 134 to 140 s | MEASURED |
+| Same request: time spent writing | 7 to 10 s | MEASURED, same files |
 
-So for your usual request, reading is about 94 percent of the wait whenever the kept prompt is not reused. In
-that test neither build reused it, because the test dropped the earlier reasoning text. That is a cache matter, not
-a kernel matter, and the lane lead has it. When reuse works, reading falls away and writing speed is what you
-feel. Kernels cannot change reuse.
+So for a long prompt, reading is about 94 percent of the wait whenever the kept prompt is not reused. In that
+test it was not reused, because the test dropped the earlier reasoning text. That is a cache matter, not a kernel
+matter. When reuse works, reading falls away and writing speed is what you feel. Kernels cannot change reuse.
 
-Prefill works through the prompt in chunks of 8,188 tokens. This build takes 5.15 s per chunk and production
-2.95 s (ESTIMATED: the two waits above divided by 26.4 chunks).
+Prefill works through the prompt in chunks of 8,188 tokens. This build takes 5.15 s per chunk (ESTIMATED: the
+wait above divided by 26.4 chunks).
 
 ## Ranked list
 
@@ -70,9 +69,9 @@ every chunk of every layer. That copying is called staging.
 Where the time is. One copy costs 1,014.8 microseconds (MEASURED on one card,
 `logs/testbox/p3-bench-20261109T185349Z.json`). Each card has 111 off-card experts per layer on the first half
 of the model and 149 on the second (MEASURED counts, `plans/00-WHERE-TIME-GOES.md`). If a chunk touches all of
-them, that is 111 x 20 layers x 1.015 ms = 2.25 s, and 3.02 s for the second half (ESTIMATED upper bound). The
-gap to production is 2.2 s per chunk. I read that as: staging is most of the prefill gap. That is a hypothesis
-until a per-chunk timing splits it.
+them, that is 111 x 20 layers x 1.015 ms = 2.25 s, and 3.02 s for the second half (ESTIMATED upper bound), against
+5.15 s per chunk. I read that as: staging is most of the prefill time. That is a hypothesis until a per-chunk timing
+splits it.
 
 The opportunity. The three-tier plan now being built keeps a small, lower-precision copy (the IQ record, about
 2 MB) of the warm experts on the card. Production already has kernels that run prefill from those records
@@ -99,7 +98,7 @@ sees at most six rows (a row is one token's data). In prefill it decodes each bl
 weights are read and decoded eight times.
 
 Where the time is. One layer with 512 rows, all experts on the card, takes 5.2 to 5.5 ms (MEASURED on one card,
-`a private working repository-nvfp4/nvfp4-8r/docs/the progress log`). Scaled to a full chunk that is 43 to 86 ms per layer, or 0.86 to
+a progress log of a private working repository). Scaled to a full chunk that is 43 to 86 ms per layer, or 0.86 to
 1.7 s per half of the model per chunk (ESTIMATED: 8 to 16 times the measurement, times 20 layers).
 
 Upstream already has the kernel. 1Cat PR #1282 adds `skinny_moe_e8m0_m8n8k4_triton`, written in Triton, a
@@ -118,7 +117,7 @@ changes how every Triton kernel in the engine is compiled. Upstream reports that
 with it on. So it needs the quality check, not only a speed check. Production is not touched.
 
 Proof. Acceptance: the existing prefill check `accept_p3_layer.py` at 64 and 512 rows, extended to 8,188, against
-the high-precision references. Then a paired per-layer timing on the four-card test machine, then the two long prompts in ABBA order.
+the high-precision references. Then a paired per-layer timing on a test card, then the two long prompts in ABBA order.
 
 ## 3. One fused kernel for the expert bookkeeping and activation
 
@@ -163,7 +162,7 @@ only over live routes, as the index scorer `v41idx.cu` does for live keys.
 
 Effort and risk. Medium. The IQ kernels share work across the four cards, which makes changes delicate.
 
-Proof. The plan 01 arm difference, then a per-layer bench with real routing on the four-card test machine.
+Proof. The plan 01 arm difference, then a per-layer bench with real routing on a test card.
 
 ## 5. Remove the zero padding from each native expert record
 
@@ -171,7 +170,7 @@ Each native record carries padding. The last matrix of an expert has 576 columns
 accepted only widths it could split evenly, so the records were padded to 640. That is 174,080 bytes of zeros in
 every 4,874,240-byte record, 3.57 percent (arithmetic from the constants in `nvfp4_8r_native.py`).
 
-Your own PR #1030 added the missing splits (9 and 18) to this kernel for exactly this width. It is open upstream
+PR #1030 (ours) added the missing splits (9 and 18) to this kernel for exactly this width. It is open upstream
 and not in this engine.
 
 Expected gain. Every expert read, every fetch and every staging copy shrinks 3.57 percent. That is 0.3 to 0.4 ms
@@ -195,7 +194,7 @@ cannot run inside the recorded launch list, and a kernel-side gather at 1,014.8.
 
 A kernel could read an expert once and also leave a copy on the card, so the next use is free (hypothesis). Its
 value depends on how often the same off-card expert returns within a few rounds, which has not been measured.
-With three-tier, decode on legal text sends almost nothing to host memory, so this item only matters if you
+With three-tier, decode on document text sends almost nothing to host memory, so this item only matters if you
 decide every route must be native. Not recommended now.
 
 ## 7. Fused kernel for the Engram table lookup in MXFP4
@@ -215,8 +214,8 @@ only if you decide to serve NVIDIA's table.
   303,004 tokens of context (MEASURED, `nvfp4-final-ctx.jsonl`), so nothing grows with context here.
 - Long-prefill attention and indexer ports (1Cat #1280 and the indexer part of #1282). Those PRs target the
   mainline DeepSeek-V4 path. This engine has its own fused prefill attention and index kernels from the earlier
-  campaign. Prefill speed does not fall with length in either build (MEASURED: production 2,610, 2,789, 2,906
-  tokens per second at 31,000, 107,000 and 258,000 tokens; this build 1,441 and 1,525 at 104,000 and 498,000).
+  campaign. Prefill speed does not fall with length (MEASURED: 1,441 and 1,525 tokens per second at 104,000 and
+  498,000 tokens).
 - FP8 dense kernels (#1021, #1157). They serve 8-bit dense weights. This build's dense weights are production's
   5-bit and 8-bit GGUF formats on the `dmv13_x` kernel. Moving to FP8 would add bytes and slow decode. It would
   be a precision choice, not a speed one.
@@ -235,4 +234,4 @@ Build item 3 first: it is small, exact, helps every round on either residency pl
 copy from. Alongside it, take one timing of a single 8,188-token chunk that separates staging, expert math and
 the rest; that one measurement decides between items 1 and 2. If staging dominates, as the arithmetic says, tie
 item 1 to the three-tier build so that reading speed does not get worse when writing speed gets better. If
-expert math is a fifth or more of the chunk, try item 2 on the four-card test machine, since the kernel already exists upstream.
+expert math is a fifth or more of the chunk, try item 2 on a test card, since the kernel already exists upstream.

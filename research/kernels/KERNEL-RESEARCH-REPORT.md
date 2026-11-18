@@ -7,7 +7,7 @@
 > `the owner`). Links to files that are not published were turned into plain text. No figure and no finding
 > was changed. Dates inside the note are its own; later results are in the build pages of this repository.
 
-Prepared for the owner by the KERNEL-RESEARCH lane, 2026-11-02 (local) / 2026-11-03 (UTC). This lane only researched and wrote. It changed no code, touched no host and used no GPU.
+Prepared 2026-11-02 (local) / 2026-11-03 (UTC). This lane only researched and wrote. It changed no code, touched no host and used no GPU.
 
 **Labels used throughout**
 
@@ -387,7 +387,7 @@ On the V100 server, DSpark-5 verify rows dominate the round. The "coupled drafts
 
 **What V100 does well:** 900 GB/s of HBM2 per card (3.3x a whole GB10), mature CUDA 12.x tooling, `mma.sync` m8n8k4 tensor cores at 125 TFLOPS FP16, and a large register file per SM.
 
-**GB10 specifics for the Spark deployment:** build with `-gencode=arch=compute_121a,code=sm_121a`. A community report says the `-arch=sm_121a` shorthand can silently produce plain sm_121, without the block-scaled FP4 MMA [R74] [UNVERIFIED by NVIDIA documentation]. FA4, DeepGEMM's SM100 path and FlashMLA (SM100) assume tcgen05/TMEM and will not run as-is [R16][R22][R23][R74].
+**GB10 specifics (DGX Spark):** build with `-gencode=arch=compute_121a,code=sm_121a`. A community report says the `-arch=sm_121a` shorthand can silently produce plain sm_121, without the block-scaled FP4 MMA [R74] [UNVERIFIED by NVIDIA documentation]. FA4, DeepGEMM's SM100 path and FlashMLA (SM100) assume tcgen05/TMEM and will not run as-is [R16][R22][R23][R74].
 
 ---
 
@@ -414,7 +414,7 @@ On the V100 server, DSpark-5 verify rows dominate the round. The "coupled drafts
 
 ---
 
-## 9. Lessons for our V100 / Spark setup
+## 9. Lessons for the V100 setup, and for DGX Spark
 
 These tie the research to our own measurements. Baseline (OUR-MEASURED [L1][L2]): a 32.3 ms round = stage 1 13.6 ms + stage 2 13.1 ms + a 5.6 ms gap (about 3.4 ms of DSpark drafter GPU work and about 2.1 ms of host time). Later A/B baselines run 31.1 ms per round, about 99-100 tok/s.
 

@@ -416,7 +416,7 @@ and it **publishes throughput numbers + specific bug fixes** 1Cat's README omits
 > **MISSING FROM OUR STACK? (flag)** FP8 KV cache (`fp8_e5m2`) on V100 gives +11–16% decode
 > AND halves KV memory — lets us push context or batch on the same cards. 1Cat exposes it as
 > experimental (`--kv-cache-dtype fp8_e5m2`); ch2lab fixed the E5M2 decode bug. Worth enabling
-> + measuring on our drafting lane. Also: ch2lab's softmax tail-max overflow fix may be the
+> + measuring on our serving lane. Also: ch2lab's softmax tail-max overflow fix may be the
 > same class of bug behind any long-context garble we've seen.
 
 ### 4.3 Standalone Volta FlashAttention kernel forks (plug into custom stacks)
@@ -536,7 +536,7 @@ Confidence: Med (vendor claim, but multiply-sourced + a matching real measuremen
 | Nemotron-49B dense | llama.cpp | 1×V100-32G | Q4_K_XL | 17.7 @7K | — | hardware-corner |
 | Qwen2.5-32B dense | LMDeploy TurboMind | 4×V100-16G | GPTQ-W4 +INT8KV | **~80** | single-stream | QwenLM#1023 |
 | Qwen2.5-32B dense | vLLM | 4×V100-16G | GPTQ-W8 | ~52 peak | 7.3 prompt/14.6 tail | QwenLM#1023 |
-| Qwen3.5-35B-A3B MoE | 1Cat-vLLM | 4×V100-32G | AWQ-W4 (WMMA) | **~121** (our notes) | LF_DRAFTER=awq | our notes + 1Cat |
+| Qwen3.5-35B-A3B MoE | 1Cat-vLLM | 4×V100-32G | AWQ-W4 (WMMA) | **~121** (our notes) | — | our notes + 1Cat |
 | Qwen3-0.6B | ch2lab vllm-v100 | 1×V100-16G | AWQ + FP8-E5M2 KV | 239 (vs 206 FP16) | +16% from FP8 KV | ch2lab |
 | Qwen2.5-7B | vLLM | 3×V100 | fp16 | 1150 (50-conc agg) | TP=2 | databasemart |
 | Qwen2.5-14B | vLLM | 3×V100 | fp16 | 492 (50-conc agg) | PP=3 (slower path) | databasemart |
@@ -548,7 +548,7 @@ Confidence: Med (vendor claim, but multiply-sourced + a matching real measuremen
 models/contexts — read the Notes column before comparing.)
 
 ### 5.2 Decision heuristics distilled from the community
-1. **MoE >> dense on V100** for tok/s (55 vs 17 same ctx). Prefer MoE (A3B/A10B) drafters.
+1. **MoE >> dense on V100** for tok/s (55 vs 17 same ctx). Prefer MoE (A3B/A10B) models.
 2. **W4 (AWQ/GPTQ) only pays off if it hits a fast kernel** — Marlin (sm75+, NOT V100) or the
    fork's **WMMA-FP16 INT4** kernel (TurboMind-SM70). Else 4-bit can be *slower* than FP16.
 3. **LMDeploy TurboMind ≥ vLLM** on V100 for dense W4 (~1.5–1.8×); set **INT8 KV (`--quant-policy 8`)**.
@@ -588,7 +588,7 @@ EP"** — TP comm overhead overwhelms compute below ~600 GB/s.
 >   model** (exactly our current "one large model per board" policy), and to go BIGGER than one
 >   board, use **PP across boards** (PP tolerates 50 Gbps ≈ 6.25 GB/s — right at our PCIe ×8!)
 >   or **EP for MoE** (route experts to other boards). This independently validates our
->   gpu_pools policy and tells us the *correct* way to span boards is **PP/EP, never TP**.
+>   card-pool policy and tells us the *correct* way to span boards is **PP/EP, never TP**.
 
 ### 3.6 Misc CN deployment-guide confirmations
 - **[CN] nvidia.csdn "【V100显卡】用vllm本地部署 QWEN3"** — confirms the universal V100 vLLM rule:
@@ -612,16 +612,16 @@ EP"** — TP comm overhead overwhelms compute below ~600 GB/s.
 
 ## 6. What our stack is missing (synthesis & recommendations)
 
-Our current V100 serving stack (per memory): **1Cat-vLLM AWQ (WMMA) drafting lane @121 tok/s**,
+Our current V100 serving stack (per memory): **1Cat-vLLM AWQ (WMMA) serving lane @121 tok/s**,
 **llama.cpp kv-split for gemma/dense**, **LMDeploy** available, **TRITON_ATTN** to dodge the
-FLASH_ATTN_V100 96KB crash, reranker/embedder sidecars. Against the community state of the art,
+FLASH_ATTN_V100 96KB crash. Against the community state of the art,
 here is what is genuinely missing or under-exploited, ranked by expected payoff:
 
 **(A) FP8 KV cache on V100 — free +11–16% decode + half the KV memory.** [ch2lab/vllm-v100]
 We are not (per memory) running `--kv-cache-dtype fp8_e5m2`. ch2lab not only enables it on sm70
 but *fixed the E5M2-decoded-as-E4M3 bug*. Half-size KV directly lets us push context length or
 batch on the same 32 GB, and the decode speedup is nearly free at ctx ≤ ~8K. **This is the
-single highest-ROI, lowest-risk change.** Test on the drafting lane; watch for the >8K overhead.
+single highest-ROI, lowest-risk change.** Test on the serving lane; watch for the >8K overhead.
 
 **(B) Re-examine the attention-backend decision (FLASH_ATTN_V100 vs TRITON_ATTN).** We
 defaulted to TRITON_ATTN after a 96KB FLASH_ATTN_V100 prefill crash. But 1Cat's *current*
@@ -648,7 +648,7 @@ board and (ii) cross-board. Could change our gemma/dense lane defaults.
 **(E) LMDeploy TurboMind as a first-class dense-W4 lane with INT8 KV.** Real-world CN evidence
 (QwenLM#1023) shows LMDeploy W4 + `--quant-policy 8` ≈ 80 tok/s vs vLLM W8 ≈ 52 on the SAME
 32B dense model, and CN sources claim ~1.5–1.8× vLLM throughput generally. Our notes have
-LMDeploy "available" but the AWQ drafter runs on 1Cat-vLLM. For **dense** 30–70B models (where
+LMDeploy "available" but the AWQ model runs on 1Cat-vLLM. For **dense** 30–70B models (where
 1Cat's MoE-tuned path is less of an advantage), LMDeploy TurboMind W4 + INT8 KV may beat our
 vLLM path. **Action:** bench LMDeploy vs 1Cat-vLLM on a dense 32B (apples-to-apples), with INT8
 KV on. (Our 121 tok/s headline is a *MoE* model — not comparable to dense 32B.)
@@ -673,7 +673,7 @@ not a config flag — but it is the only credible "serve a model bigger than the
 
 **What we are NOT missing (doing right):** one-large-model-per-NVLink-board (TP within board);
 MoE-first for tok/s; AWQ-WMMA via 1Cat; TRITON_ATTN as a safe attention default; FP16 dtype.
-The community broadly does exactly this — our gpu_pools "no cross-board job" rule is *validated*
+The community broadly does exactly this — our "no cross-board job" rule is *validated*
 by the TP/PP bandwidth math.
 
 ---

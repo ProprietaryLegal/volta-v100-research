@@ -7,7 +7,7 @@
 > `the owner`). Links to files that are not published were turned into plain text. No figure and no finding
 > was changed. Dates inside the note are its own; later results are in the build pages of this repository.
 
-*For the owner, 2026-11-02. A companion to the technical report (KERNEL-RESEARCH/REPORT.md), which carries the sources and the detail.*
+*2026-11-02. A companion to the technical report (KERNEL-RESEARCH/REPORT.md), which carries the sources and the detail.*
 
 ---
 
@@ -189,6 +189,6 @@ Most of a model's work falls into a dozen families:
 
 **The V100 is a sunset platform.** NVIDIA's CUDA 13 no longer compiles for it. PyTorch is phasing it out. Most of the famous modern kernels (FlashAttention 2, 3 and 4, Marlin, DeepSeek's own kernel libraries) never supported it. Our practice is to borrow the *ideas* and write our own V100 versions, and to keep the software versions pinned to ones that still support the card.
 
-**The DGX Spark boxes are the opposite case.** They are new Blackwell-generation hardware, but their memory road is much narrower: about 273 GB/s per box, against 900 GB/s for *each* of the V100 server's eight V100s. They also lack some features of NVIDIA's datacenter Blackwell chips, so kernels built for those chips won't run on them as-is. On the Sparks, data volume per word matters even more, and the choice of compressed weight format is the main lever.
+**NVIDIA's DGX Spark is the opposite case.** It is new Blackwell-generation hardware, but its memory road is much narrower: about 273 GB/s per box, against 900 GB/s for *each* of the V100 server's eight V100s. It also lacks some features of NVIDIA's datacenter Blackwell chips, so kernels built for those chips won't run on it as-is. On a Spark, data volume per word matters even more, and the choice of compressed weight format is the main lever.
 
 **Bottom line.** The research and our own numbers agree on the order of attack: first stop doing unnecessary work, then cut the number of kernels and the gaps between them, then cut the bytes. Prove each step with a correctness test and an honest end-to-end A/B.

@@ -43,14 +43,14 @@ While one board works the other waits (stage 2's recv kernel spins 10.1 ms per r
 
 ## Findings, ranked by ESTIMATED tok/s gain
 1. **Host gap: CORRECTED 01:25Z to ~2.1 ms (6.5 %)**; the other 3.4 ms of the 5.6 ms gap is the DSpark drafter on stage 2 (CPU trace: stage 2's D2H copy completes 3.4 ms after the forward annotation; 342 drafter kernels sit in that window). Original text: PP2 runs synchronous scheduling (`no-async-scheduling`, VLLM_V41_ASYNC unset; the
-   1Cat #1277 TP4 path sets VLLM_V41_ASYNC=1). Async PP removes most of the ~2.1 ms: ESTIMATED +5-7 %. Owner: main. Also cheap: a num_speculative_tokens sweep (3/4/5): later draft positions accept rarely and each costs ~0.65 ms of drafter plus verify rows.
+   1Cat #1277 TP4 path sets VLLM_V41_ASYNC=1). Async PP removes most of the ~2.1 ms: ESTIMATED +5-7 %. Also cheap: a num_speculative_tokens sweep (3/4/5): later draft positions accept rarely and each costs ~0.65 ms of drafter plus verify rows.
 2. **Indexer score all-reduce over the full 524,288-key store every step.** After `index_scores_decode`, the decode
    path all-reduces `scores[tokens, keys.shape[0]]`, the whole packed store width (6 MiB ratio 1, 3 MiB ratio 2), on
    NCCL, whatever the live context. 1.5 ms per round at short context (4.7 %). Fix: reduce only the live prefix
    (graph-safe bounded reduce), or gather q/weights and score all heads locally. ESTIMATED +4-5 % at short context.
 3. **Launch bubbles ~2 ms per stage**, 2,089 kernels per round: fusion work (KFUS1 P1/N1 direction). +5-10 %.
-4. **Experts 8.3 ms (26 %)**, already near the memory limit for IQ2_XXS: only fewer bytes help (our DGX Spark work's
-   lever 2, expert top-p prune, lossy, +3-6 %).
+4. **Experts 8.3 ms (26 %)**, already near the memory limit for IQ2_XXS: only fewer bytes help (lever 2 of earlier
+   work: expert top-p prune, lossy, +3-6 %).
 5. **Dense GEMV 4.7 ms (15 %)**: check achieved bandwidth vs the QPN8 FP8 GEMV (v100-skinny 718.6 GB/s at M=1).
 
 ## Why PR #344 doesn't transfer directly
@@ -59,5 +59,5 @@ While one board works the other waits (stage 2's recv kernel spins 10.1 ms per r
 - V4.1 Flash 1017 in native MXFP4 needs ~269-289 GiB for the experts alone (ESTIMATED), more than the 256 GiB of HBM
   on 8 GPUs, so the native route needs host spill (#1031) or 12 GPUs.
 - Our IQ2_XXS expert kernels already run near the memory limit, and #344's #308-style MXFP4 hot paths don't touch
-  GGUF experts (fork-sparks-upstream TOK1103 facts, 01:0xZ).
+  GGUF experts (TOK1103 facts, 01:0xZ).
 - What does transfer: the dense-layer FP8-QPN GEMV idea (finding 5) and the host-side discipline (finding 1).

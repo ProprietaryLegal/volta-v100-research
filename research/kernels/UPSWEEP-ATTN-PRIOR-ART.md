@@ -9,7 +9,7 @@
 
 UPSWEEP, 2026-11-01 (about 17:30Z). Research only. No the V100 server GPU, no builds; the V100 server reads were read-only.
 
-Question from main (16:57Z): KATT1's HMMA decode attention kernel (patch 0012) failed R6 numerics on three
+Question (16:57Z): KATT1's HMMA decode attention kernel (patch 0012) failed R6 numerics on three
 q std 2000 cases. How do existing sm70 tensor-core attention kernels stay accurate at extreme logit scales
 without losing speed, and what can KATT1 adopt, at what cost in microseconds?
 
@@ -437,8 +437,8 @@ FADD/thread on the critical path, about 0.2-0.4 µs at 1.4 GHz before overlap wi
   mean chain truncation (rows 1 and 5); otherwise it is the `a*scale` rounding (rows 3 and 4).
 - **Emulation.** A model of HMMA internals (alignment and truncation inside each k=4 step) will always be
   imperfect. Shorter chains (row 1) and exact-offset softmax (rows 3 and 4) reduce how far that imperfection can
-  move the output. This is a better route to `matches_emulation` than loosening its tolerance. main asked
-  (17:08Z) that no tolerance be loosened without real-scale evidence and an an internal audit review.
+  move the output. This is a better route to `matches_emulation` than loosening its tolerance. The coordinator
+  asked (17:08Z) that no tolerance be loosened without real-scale evidence and an internal audit review.
 
 ---
 
