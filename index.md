@@ -361,7 +361,7 @@ overhead per layer, not arithmetic. One seventh is outside any kernel.
 
 ## Part 8: The hardware, what it costs and what it gives
 
-The parts list, with what was paid for each part, links, cooling options and photos, is its own page:
+The parts list, with rough prices, search links, cooling options and photos, is its own page:
 **[the hardware list](hardware.md)**. This part is the argument for and against, mostly in the founder's own public
 words.
 
@@ -381,15 +381,15 @@ and from [the hardware update of November 2026](https://www.reddit.com/r/homelab
 
 **What you buy**, in short ([full list with links](hardware.md#the-parts)):
 
-| Part | For one four-card board | Paid in 2026 |
+| Part | For one four-card board | Roughly, used, in 2026 |
 |---|---|---|
-| Tesla V100-SXM2-32GB modules | 4 | $454 to $490 each in February and March; $679 in September |
-| Four-card SXM2 NVLink baseboard | 1 | $785 in March; $853 to $882 from June |
-| PCIe switch card with SlimSAS ports, and SlimSAS cables | 1 or 2 cards, 4 cables | $126 to $221 a card (PCIe 3.0); $529 for a PCIe 4.0 card that takes two boards |
-| Heatsinks, thermal paste | 4 | $48 to $97 each when not sold with the card |
-| A power supply with enough PCIe 8-pin cables | 1 | $73 for a 2,000 W unit |
-| A blower or a server chassis | 1 | a duct fan, or $311 for a 4U chassis |
-| A host with a free x16 slot per switch card, and ECC memory | | a 12-core workstation CPU and board, about $680 together in March |
+| Tesla V100-SXM2-32GB modules | 4 | $450 to $700 each during the year; about $900 by November |
+| Four-card SXM2 NVLink baseboard | 1 | $800 to $900 |
+| PCIe switch card with SlimSAS ports, and SlimSAS cables | 1 or 2 cards, 4 cables | $125 to $220 a card (PCIe 3.0); about $530 for a PCIe 4.0 card that takes two boards |
+| Heatsinks, thermal paste | 4 | $50 to $100 each when not sold with the card |
+| A power supply with enough PCIe 8-pin cables | 1 | about $75 for a 2,000 W unit |
+| A blower or a server chassis | 1 | a duct fan, or about $310 for a 4U chassis |
+| A host with a free x16 slot per switch card, and ECC memory | | a 12-core workstation CPU and board, about $680 together |
 
 **What it cost, and what it costs now.** The eight-card machine, in his words in November
 ([comment](https://www.reddit.com/r/homelab/comments/1xusbar/lawyers_v100_homelab_update_2_the_8x_v100_box_now/19sn8jhhqo59f/)):

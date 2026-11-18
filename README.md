@@ -16,7 +16,7 @@ engines: the code of each build lives in that build's own repository, linked fro
 |---|---|
 | [index.md](index.md) | The post: Volta's architecture, how it compares with newer chips, how it was made to work under 1Cat-vLLM, every optimization, the testing method, when each optimization applies, how to build a kernel, the hardware and its drawbacks |
 | [builds.md](builds.md) | Every final build with its link, what it runs on and its headline measured numbers |
-| [hardware.md](hardware.md) | The hardware list: every part of a four-card SXM2 NVLink board and its host, what was paid, links, cooling options, photos, what goes wrong |
+| [hardware.md](hardware.md) | The hardware list: the parts for a four-card SXM2 NVLink board and its host, rough prices, search links, cooling options, photos, what goes wrong |
 | [optimizations/](optimizations/README.md) | One page per build with its full table of what was adopted and what lost; [what-did-not-work.md](optimizations/what-did-not-work.md) across all builds |
 | [method/testing.md](method/testing.md) | The testing method as a reusable document, including what went wrong with it |
 | [method/kernel-building.md](method/kernel-building.md) | How to build a custom kernel for sm_70 |
