@@ -311,8 +311,7 @@ not a reason to circle. Three corrections from the founder shaped the work as mu
   cold read of the same prompt at near-tied tokens. A test that assumes otherwise fails correct code.
 - *A slowdown its user caught first.* On 2026-11-06 one-stream decode on the serving build fell from about 130
   tok/s to about 21, and it was the person using it who noticed, not the campaign's checks. Use stopped until it
-  was measured fixed. A serving build needs a speed check that runs without being asked; ours now probes every
-  boot.
+  was measured fixed. A serving build needs a speed check that runs without being asked.
 - *A sum is not a rate.* "Four requests: 306.6 tok/s" was a sum of four rates. By wall clock it was 242.6.
 
 **What an independent review found.** After the twelve-card build was serving, a second model was given the whole
