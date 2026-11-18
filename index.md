@@ -282,18 +282,12 @@ The full method, as a reusable document, is [method/testing.md](method/testing.m
    Closeness cannot show closeness to the original model if the reference is a quantization.
 8. **Checks run on real logs before a window.**
 
-**The other half of the method: do not test forever.** The rules above apply where a result is claimed. They are
-not a reason to circle. Three corrections from the founder shaped the work as much as any rule:
-
-- *Launch the proven recipe first.* In September a hand-built runtime for an earlier model had absorbed days of
-  testing and decoded at 1.13 tok/s. The upstream 1Cat-vLLM recipe, launched as its authors publish it, gave about
-  49 tok/s on the same cards the same week ([earlier builds](optimizations/earlier-builds.md#glm-53-flash-nvfp4-on-eight-v100s-with-1cat-vllm-september-2026)).
-- *Read upstream before planning.* A plan was once drawn up on the premise that a 4-bit format could not help on a
-  card without 4-bit hardware, while v100-skinny already ran exactly that format at 77 % of the card's read
-  ceiling. Since then every build keeps a page of front-line upstream facts, and no plan is written before it is
-  read.
-- *A test exists to decide something.* Repeating conservative tests is not searching for optimizations; reading
-  other people's code is. And a pile of checks is no substitute for looking at the final result whole.
+**The other half of the method: do not test forever.** The rules above apply where a result is claimed; they are
+not a reason to circle. Launch the proven upstream recipe first: in September a hand-built runtime decoded at 1.13
+tok/s after days of testing, and the upstream recipe gave about 49 on the same cards that week. Read upstream
+before planning: one plan assumed a 4-bit format could not help on Volta while v100-skinny already ran it at 77 %
+of the read ceiling. And a test exists to decide something
+([the long form](method/testing.md#0-before-any-of-this-launch-first-read-upstream-first)).
 
 **What went wrong.** These are the most useful paragraphs on the page.
 
