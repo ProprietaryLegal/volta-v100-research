@@ -1,17 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 808 494" width="808" height="494" role="img" aria-labelledby="t d">
 <title id="t">The build family tree</title>
-<desc id="d">1Cat pull request 1277, 1Cat-vLLM and v100-skinny are other people's work that every build runs on. Earlier PLI Labs builds: DeepSeek-V4-Flash with llama.cpp in July 2026, the first twelve-card port in October, and a build on the EXL3 engine on 2026-11-01. The Volta builds, each on the engine of the one before: Volta sPLIt (2026-11-03 to 11-05, a port of pull request 1277 to two boards), Volta Full NVFP4 (2026-11-09), Volta Max uPLIft (2026-11-10 to 11-13) and Volta 12X AmPLIfy (2026-11-17, twelve cards, using the three-stage cut of the October port).</desc>
+<desc id="d">1Cat pull request 1277, 1Cat-vLLM and v100-skinny are other people's work that every build runs on. Earlier PLI Labs builds: DeepSeek-V4-Flash with llama.cpp in July 2026, the first twelve-card port in October, and a build on the EXL3 engine on 2026-11-01. The Volta builds, each on the engine of the one before: Volta sPLIt (a port of pull request 1277 to two boards), Volta Full NVFP4, Volta Max uPLIft and Volta 12X AmPLIfy (twelve cards, using the three-stage cut of the October port).</desc>
 <rect width="808" height="494" fill="#ffffff"/>
 <text x="24" y="30" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="bold" fill="#1b1f24" text-anchor="start">The build family tree</text>
 <text x="24" y="58" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#57606a" text-anchor="start">Other people's work that every build runs on</text>
 <rect x="24" y="66" width="240" height="64" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
 <text x="34" y="86" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">1Cat #1277 (yangzhuxinyzx)</text>
 <text x="34" y="104" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">DeepSeek-V4.1 on one 4-card board</text>
-<text x="34" y="120" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">warm round 24.9 ms (upstream)</text>
+<text x="34" y="120" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">the base of every build below</text>
 <rect x="284" y="66" width="240" height="64" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
 <text x="294" y="86" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">1Cat-vLLM (1CatAI)</text>
 <text x="294" y="104" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">the Volta and Turing vLLM fork</text>
-<text x="294" y="120" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">the engine of every build below</text>
+<text x="294" y="120" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">the engine all of them run on</text>
 <rect x="544" y="66" width="240" height="64" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
 <text x="554" y="86" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">v100-skinny (dnv2003)</text>
 <text x="554" y="104" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">NVFP4 and FP8 kernels for Volta</text>
@@ -20,32 +20,32 @@
 <rect x="24" y="174" width="240" height="64" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
 <text x="34" y="194" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">V4-Flash with llama.cpp</text>
 <text x="34" y="212" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">July 2026, 8 cards</text>
-<text x="34" y="228" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">12.2 tok/s</text>
+<text x="34" y="228" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">a layer split across two boards</text>
 <rect x="284" y="174" width="240" height="64" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
 <text x="294" y="194" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">First 12-card port (1Cat #1031)</text>
 <text x="294" y="212" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">October 2026, 3 stages of 4</text>
-<text x="294" y="228" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">about 3 tok/s, no CUDA graphs</text>
+<text x="294" y="228" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">the official checkpoint, no CUDA graphs</text>
 <rect x="544" y="174" width="240" height="64" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
 <text x="554" y="194" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">Build on the EXL3 engine</text>
-<text x="554" y="212" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">2026-11-01, 8 cards (philbert440's engine)</text>
-<text x="554" y="228" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">42 to 46 tok/s</text>
+<text x="554" y="212" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">2026-11-01, 8 cards</text>
+<text x="554" y="228" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">on philbert440's engine and EXL3 pack</text>
 <text x="24" y="274" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#57606a" text-anchor="start">The Volta builds</text>
 <rect x="24" y="282" width="240" height="64" rx="6" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.2"/>
 <text x="34" y="302" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">Volta sPLIt</text>
 <text x="34" y="320" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">2026-11-03 to 11-05, 8 cards</text>
-<text x="34" y="336" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">99 to about 135 tok/s; compressed experts</text>
+<text x="34" y="336" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">compressed experts, all on the cards</text>
 <rect x="284" y="282" width="240" height="64" rx="6" fill="#fff8c5" stroke="#9a6700" stroke-width="1.2"/>
 <text x="294" y="302" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">Volta Full NVFP4</text>
 <text x="294" y="320" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">2026-11-09, 8 cards (the reference)</text>
-<text x="294" y="336" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">28 to 30 tok/s; all experts native</text>
+<text x="294" y="336" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">all experts native, overflow in host RAM</text>
 <rect x="544" y="282" width="240" height="64" rx="6" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.2"/>
 <text x="554" y="302" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">Volta Max uPLIft</text>
 <text x="554" y="320" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">2026-11-10 to 11-13, 8 cards</text>
-<text x="554" y="336" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">95 to 118 tok/s; most-used experts native</text>
+<text x="554" y="336" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">most-used experts native, all on the cards</text>
 <rect x="284" y="386" width="500" height="64" rx="6" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.2"/>
 <text x="294" y="406" font-family="Helvetica, Arial, sans-serif" font-size="12.5" font-weight="bold" fill="#1b1f24" text-anchor="start">Volta 12X AmPLIfy</text>
 <text x="294" y="424" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#1b1f24" text-anchor="start">2026-11-17, 12 cards, 3 stages of 4: every expert native, all on the cards</text>
-<text x="294" y="440" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">128 tok/s for one request; 3,284 to 3,733 tok/s prompt reading; not yet published</text>
+<text x="294" y="440" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">all 15,360 routed experts at NVIDIA's NVFP4 precision in card memory</text>
 <line x1="144" y1="130" x2="144" y2="148" stroke="#57606a" stroke-width="1.6" stroke-linecap="square"/>
 <line x1="144" y1="148" x2="10" y2="148" stroke="#57606a" stroke-width="1.6" stroke-linecap="square"/>
 <line x1="10" y1="148" x2="10" y2="314" stroke="#57606a" stroke-width="1.6" stroke-linecap="square"/>
@@ -64,5 +64,5 @@
 <line x1="268" y1="418" x2="200" y2="418" stroke="#57606a" stroke-width="0.8" stroke-linecap="square"/>
 <line x1="664" y1="346" x2="664" y2="378" stroke="#57606a" stroke-width="1.6" stroke-linecap="square"/>
 <polygon points="664,386 660,378 668,378" fill="#57606a"/>
-<text x="24" y="478" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="start">Each Volta build runs on the engine of the one before it. Figures are each build's own, under its own conditions (builds.md).</text>
+<text x="24" y="478" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="start">Each Volta build runs on the engine of the one before it. The numbers of each build are in builds.md.</text>
 </svg>

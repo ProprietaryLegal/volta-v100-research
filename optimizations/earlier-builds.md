@@ -30,8 +30,8 @@ Pull request: [1Cat-vLLM #1031](https://github.com/1CatAI/1Cat-vLLM/pull/1031) Â
 | Block-FP8 dense weights can stay FP8 on Volta | UPSTREAM: dense bytes 63.5 to 33.7 MiB per layer set; 115.2 to 74.2 microseconds at one row (-36 %); a loss above 16 rows (+13 % at 32, +23 % at 64) | [#1021](https://github.com/1CatAI/1Cat-vLLM/pull/1021), merged 2026-11-16 |
 | The MXFP4 expert kernel generalised to this model's geometry (384 experts, 6 active; split sizes 4, 6, 9, 12, 18) | - | [#1030](https://github.com/1CatAI/1Cat-vLLM/pull/1030), open |
 
-What it taught: the layout was right and the engine was not yet fast. What turned about 3 tok/s into about 100
-within a month was other people's engine work on the same fork: CUDA graphs and the speculative drafter for this
+What it taught: the layout was right and the engine was not yet fast, because it had no CUDA graphs. Other
+people's engine work on the same fork supplied what was missing: CUDA graphs and the speculative drafter for this
 model ([#1243](https://github.com/1CatAI/1Cat-vLLM/pull/1243), rivetphilbot) and the complete four-card package
 with packed key-value storage ([#1277](https://github.com/1CatAI/1Cat-vLLM/pull/1277), yangzhuxinyzx).
 
@@ -47,10 +47,9 @@ The engine and the EXL3 pack are Phil Tompkins' ([philbert440/deepseek-v4.1-v100
 | Engram tables resident in RAM instead of read from disk | cold first token on a 75K-token prompt 46.00 to 26.94 s (-41.4 %); warm first token unchanged; three concurrent 300K prompts 476 to 368 s; 16 of 16 greedy outputs byte-identical | [interim report](https://github.com/ProprietaryLegal/deepseek-v4-flash-v100#deepseek-v41-flash-1017-on-8-v100-with-1cat-vllm-results-so-far-2026-11-01) |
 | A shared-memory-staged prefill kernel for the EXL3 experts | -7.5 to -13.2 % per tiled pass on one card, bit-identical. Kernel level only; no server measurement | same |
 | Hardware faults found on the way | PCIe completion-timeout resets at a higher power limit with uncapped clocks; ECC errors that stopped when memory speed was lowered | same |
-| Where it stayed ahead of Volta sPLIt | faster reading of short and medium prompts (about 2,900 to 3,300 tok/s by its own method) and three requests at once | [Volta sPLIt README](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4#what-this-is) |
 
-What it taught: per verify round the next engine was about three times faster (71 ms against 23 ms, ESTIMATE by
-arithmetic on the two builds' measured rounds). The round, not tokens per second, became the unit.
+What it taught: the verify round, not tokens per second, is the unit to measure an engine in. Tokens per second
+moved with the test text; the round did not.
 
 ## The 1Cat package on one four-card board (2026-11-02)
 

@@ -2,7 +2,7 @@
 
 Every idea below was built, or sized far enough to be closed, and lost. They are grouped by the reason they lost,
 because the reason is what transfers to another machine. Each row names the build it was tested on and links its
-record. Rows from the twelve-card build come from a private working record (its repository is not yet published).
+record.
 
 All figures are MEASURED on the build named, under that build's conditions
 ([builds.md](../builds.md) gives them), unless the row says ESTIMATE.
@@ -13,9 +13,9 @@ The cards read their own memory at hundreds of GB/s and reach anything else at a
 
 | Idea | Build | Result | Record |
 |---|---|---|---|
-| Keep the less-used experts in host RAM and read them when routed | Volta Full NVFP4 | about 975 microseconds per host-RAM expert per layer at one row; 28 to 30 tok/s against 118 with every expert on the cards. No miss path (zero-copy mapping, copy-engine DMA, a gather on the card, an AVX2 host kernel) came within about 10 ms per round (ESTIMATE from the measured miss costs) | [README](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100#what-did-not-work-or-is-not-yet-good) |
+| Keep the less-used experts in host RAM and read them when routed | Volta Full NVFP4 | about 975 microseconds per host-RAM expert per layer at one row; the build decodes at 28 to 30 tok/s on legal-style text. No miss path (zero-copy mapping, copy-engine DMA, a gather on the card, an AVX2 host kernel) came within about 10 ms per round (ESTIMATE from the measured miss costs) | [README](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100#what-did-not-work-or-is-not-yet-good) |
 | One tensor-parallel group of eight cards across two boards (probe) | Volta sPLIt | the eight-way sum across the boards took 30.8 microseconds against 5.28 inside one board; best modelled round 24.65 ms against a 22.0 ms bar. No-go before a build | [levers](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/blob/main/docs/levers.md#did-not-work) |
-| The same idea built in full: one stage on eight cards, a per-layer exchange between the boards | eight cards, tested during the twelve-card work | against two stages of four: one request -3 %, three at once -41 %, long prompt reads -26 % | private record |
+| The same idea built in full: one stage on eight cards, a per-layer exchange between the boards | eight cards, one test window during the twelve-card work | against the same eight cards as two stages of four: one request -3 %, three at once -41 %, long prompt reads -26 % | [the twelve-card page](volta-12x-amplify.md#rejected) |
 | A draft model on a separate GPU over the network | Volta Max uPLIft | 42.6 ms per draft round at the median against a 4.5 ms bar; the draft head itself runs in 1.7 ms there | [README](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4#what-did-not-work-or-is-not-yet-good) |
 | A layer split over more than two boards with llama.cpp | DeepSeek-V4-Flash, July 2026 | fourteen cards halve the throughput of eight (7.8 against 12.2 tok/s) | [README](https://github.com/ProprietaryLegal/deepseek-v4-flash-v100#quickstart) |
 | The Engram rows cached in spare card memory | Volta sPLIt | not built: all host Engram work is about 0.12 ms per round, and a round needs all 288 rows, so a partial cache removes nothing | [levers](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/blob/main/docs/levers.md#did-not-work) |
@@ -61,7 +61,7 @@ the other.
 | 64 rows per weight load in the prompt-reading expert kernel | Volta Max uPLIft | the same bits, slower: 204 registers per thread, up to 1.39 times the old time per cycle | registers and shared memory on this chip | [README](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4#what-did-not-work-or-is-not-yet-good) |
 | A tensor-core prompt-reading kernel that is not bit-equal | Volta Max uPLIft | 21.8 % slower on one card than the kernel it would replace | - | same |
 | A new decode kernel for the NVFP4 experts | Volta Max uPLIft | closed without a build on eight cards: on one card the variants predicted 0.000 ms per round by a rule fixed before the data | the "1.45 ms" that started the work was an upper bound on headroom, not a prediction | same |
-| 200 W in place of 150 W per card | Volta sPLIt | -0.06 ms per round: neutral | decode is not power-bound. (On the twelve-card build 200 W did raise prompt reading by 13.7 %) | [levers](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/blob/main/docs/levers.md#did-not-work) |
+| 200 W in place of 150 W per card | Volta sPLIt | -0.06 ms per round: neutral | decode is not power-bound | [levers](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/blob/main/docs/levers.md#did-not-work) |
 
 ## 5. It was a scheduling or host change that cost more than it saved
 
@@ -70,19 +70,19 @@ the other.
 | Asynchronous scheduling with a pipeline and speculative decoding | Volta sPLIt | +1.678 ms per round slower once its crash was fixed. 1Cat's own [issue #852](https://github.com/1CatAI/1Cat-vLLM/issues/852) (zambalee) reports +55 % decode from turning it off on a two-stage V100 build (UPSTREAM) | [levers](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/blob/main/docs/levers.md#did-not-work) |
 | CPU pinning, a spin-wait in the broadcast queue, 8 router warps | Volta sPLIt | +0.079 ms; +0.04 to +0.09 ms; -0.027 ms (neutral) | same |
 | A fused layer transition, three variants | Volta sPLIt | slower or neutral | same |
-| Releasing the allocator's cache more often (at 512 rows) | Volta 12X AmPLIfy | the same memory peak; larger turns' first token 10.9 s against 5.2 s | private record |
-| Awaiting each hand-off between stages | Volta 12X AmPLIfy | no memory gain (31,664 against 31,628 MiB) | private record |
+| Releasing the allocator's cache more often (at 512 rows) | Volta 12X AmPLIfy | the same memory peak; larger turns' first token 10.9 s against 5.2 s | [README](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#what-did-not-work-or-is-not-yet-good) |
+| Awaiting each hand-off between stages | Volta 12X AmPLIfy | no memory gain (31,664 against 31,628 MiB) | [README](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#what-did-not-work-or-is-not-yet-good) |
 | Prompt chunk size chosen by prompt length | Volta Max uPLIft | the same output on only 25 of 31 cases and 522 MiB more card memory | [README](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4#what-did-not-work-or-is-not-yet-good) |
 | Prompt slots as a way to serve a short request during a long read | Volta Max uPLIft | the short request starts in 4.1 to 4.3 s and not 56.8 s, but decodes at 15.3 tok/s until the read ends, and both requests end later than with one slot | [README](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4#requests-at-once) |
-| More requests at once than pipeline stages | Volta 12X AmPLIfy | four together gave 6 % more than three (306.6 against 288.0 tok/s, summed) | private record |
+| More requests at once than pipeline stages | Volta 12X AmPLIfy | four together gave 6 % more than three (306.6 against 288.0 tok/s, summed) | [README](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#measured) |
 
 ## 6. It did not survive first contact with the hardware
 
 | What | Build | What happened | Record |
 |---|---|---|---|
 | The four-card package of the later patches | Volta sPLIt | failed to boot in its smoke test; marked not current | [four-card.md](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/blob/main/docs/four-card.md) |
-| The first three-stage boot | Volta 12X AmPLIfy | 15 of 15 answers wrong: the scheduler did not space decode steps by the pipeline depth | private record; [the build's page](volta-12x-amplify.md#what-had-to-be-built) |
-| Two engine changes that had passed CPU tests | Volta 12X AmPLIfy | one died on a table sized for four slots, one refused to boot in the model loader. Their CPU tests had not gone through the server's real entry point | private record |
+| The first three-stage boot | Volta 12X AmPLIfy | 15 of 15 answers wrong: the scheduler did not space decode steps by the pipeline depth | [README](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#what-did-not-work-or-is-not-yet-good); [the build's page](volta-12x-amplify.md#what-had-to-be-built) |
+| Two engine changes that had passed CPU tests | Volta 12X AmPLIfy | one died on a table sized for four slots, one refused to boot in the model loader. Their CPU tests had not gone through the server's real entry point | [README](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#what-did-not-work-or-is-not-yet-good) |
 | The first fast-reading variant | Volta Max uPLIft | stopped the host or a card on one long chat, three times of three, until the host's power delivery was changed | [README](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4#what-did-not-work-or-is-not-yet-good) |
 | A quantized key cache with llama.cpp | DeepSeek-V4-Flash | healthy status, confident nonsense, no error | [README](https://github.com/ProprietaryLegal/deepseek-v4-flash-v100#the-bug-you-need-to-know-about--updated-it-affects-every-backend-not-just-volta) |
 

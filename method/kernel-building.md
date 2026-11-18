@@ -174,7 +174,7 @@ honestly instead of being "probably a small win".
 
 - The measured time budget of a decode round on eight cards:
   [Volta Max uPLIft, docs/research/LANE-RESEARCH.md](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4/blob/main/docs/research/LANE-RESEARCH.md)
-  and its copy in [research/eight-card/](../research/README.md).
+  (see also [research/](../research/README.md)).
 - The same on twelve cards: [optimizations/volta-12x-amplify.md](../optimizations/volta-12x-amplify.md#where-the-time-goes).
 - The published kernels: the production patches of
   [Volta sPLIt](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/tree/main/engine/production)

@@ -4,8 +4,8 @@ Build: DeepSeek-V4.1-Flash-1017 on eight V100-SXM2-32GB with every routed expert
 NVIDIA's NVFP4 pack. The most-used experts are on the cards; the rest are in pinned host RAM and are read over PCIe.
 Repository: <https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100>.
 
-This is a reference build. It is slow on purpose: it is the all-NVFP4 output that the faster builds are compared
-with. Every figure below is MEASURED on 2026-11-09 unless the row says ESTIMATE, at a 1,522 MHz clock ceiling on the
+This is a reference build: it exists to give an all-NVFP4 output to check other work against, and it accepts
+being slow for that. Every figure below is MEASURED on 2026-11-09 unless the row says ESTIMATE, at a 1,522 MHz clock ceiling on the
 eight-card server, or on one card of a four-card test machine at 150 W where the row says "one card". Source of every
 row: the repository's [README](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100#readme)
 and [docs/measurements.md](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100/blob/main/docs/measurements.md).
@@ -26,10 +26,10 @@ and [docs/measurements.md](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-
 
 | Item | Result | What follows |
 |---|---|---|
-| Speed | 14 to 26 % of Volta sPLIt's tok/s on the short sets (28.2 and 30.2 tok/s legal-style, 18.8 and 20.1 general) | Use it as a reference, not as a server |
+| Speed | 28.2 and 30.2 tok/s on a legal-style short set, 18.8 and 20.1 on a general set | Use it as a reference, not as a server |
 | **Reading experts from host RAM** | one host-RAM expert per token at 1 row adds about 975 microseconds to a layer; at 6 rows each costs about 1.0 to 1.4 ms per layer (about 3.5 to 4.9 GB/s over PCIe). Other miss paths on one card: copy-engine DMA 743.7 microseconds per expert, a gather on the card 1,014.8, an AVX2 host kernel 2,953.7 | ESTIMATE from those: no miss path comes within about 10 ms per round of all experts on the cards. **This number is why the later builds keep every expert in card memory** |
 | General text | about half the legal-style speed (174.64 against 87.58 ms per round) | The most-used set was chosen from routing counts that are not published, and general text misses it more often. With no experts in host RAM the gap goes away |
-| Prompt reading | 1,419 to 1,595 tok/s, 54 to 56 % of Volta sPLIt's rate | Every expert not on the cards is staged from host RAM while reading |
+| Prompt reading | 1,419 to 1,595 tok/s | Every expert not on the cards is staged from host RAM while reading |
 | MXFP4 Engram tables from NVIDIA's pack | built and checked (rows bit-equal), but the 4-bit GGUF table decodes 4 to 5 times more rows per second | Not the default |
 | Memory margin | highest card memory seen 32,086 MiB against a limit of about 32,494 | About 0.4 GiB of margin on the first stage |
 | First boots | three failed fast: a host mapping requested on card 0 for every worker; staging buffers kept per layer instead of per card; one shared reserve for both stages | Each fixed at its cause |

@@ -38,8 +38,9 @@ how much of the routed work can run at the official precision with every expert 
 | Dropping the host tier | An earlier step kept part of the experts in host RAM (three tiers). General text was slow there because of host-RAM reads | general text 33.4 ms per round without a host tier against 58.0 to 59.4 ms with it (2026-11-09; speed only, that profile was not accepted) | - | [README, "What worked"](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4#what-worked) |
 | Per-stage card reserve | One reserve for both stages ran out of memory on a 100K prompt. Reserves are now set per stage from memory peaks sampled during long reads | a 498,099-token prompt reads without an out-of-memory error | - | same |
 
-How far the result is from the NVFP4 pack, measured against Volta sPLIt under rules fixed before any capture, is in
-[builds.md](../builds.md#volta-max-uplift).
+How close the result is to NVIDIA's NVFP4 pack, measured under rules fixed before any capture, is in
+[builds.md](../builds.md#volta-max-uplift): the same next token on 95.1 % of compared tokens for the build of the
+first release.
 
 ## Adopted: speed
 
@@ -69,7 +70,6 @@ A token-exact test of cache reuse must compare a hit with a hit at the same posi
 
 | Item | Result (MEASURED) | Why, or what follows |
 |---|---|---|
-| Slower than Volta sPLIt in decode | On the benches of 2026-11-12 and 2026-11-13: slower in every code and legal cell and every short-prompt row; the first token comes sooner at every length | The build's aim is closeness to the NVFP4 pack, not speed. Its page reports the difference and does not attribute it to one cause |
 | A decode kernel for the NVFP4 path (closed without a change) | An earlier "1.45 ms per round" was an upper bound on headroom, not a prediction. On one card the candidate launch variants predicted 0.000 ms per round by a rule fixed before the data, and the remaining fold 0.066 ms, below what an eight-card run can resolve | No eight-card window was spent on it |
 | An expert kernel with 64 rows per weight load (RB 8) | the same bits, but slower: 204 registers per thread and 41,728 bytes of shared memory per block; up to 1.39 times the old kernel's time per cycle | Not shipped |
 | A tensor-core prompt-reading kernel whose output is not bit-equal | on one card 21.8 % slower than the RB 4 kernel it would replace; its rule asked for 10 % faster | No go |

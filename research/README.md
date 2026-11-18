@@ -33,11 +33,11 @@ links to the originals.
 | [kernels/PROF1103b-REPORT.md](kernels/PROF1103b-REPORT.md) | The second profile, after the first levers | 2026-11-03 |
 | [kernels/PROF1-report.md](kernels/PROF1-report.md) | The earlier profile of the EXL3 engine's round | 2026-11-01 |
 | [kernels/TOK1103-REPORT.md](kernels/TOK1103-REPORT.md) | Tokens-per-second levers found in v100-skinny and 1Cat-vLLM, with upstream numbers and our estimates | 2026-11-03 |
-| [eight-card/LANE-RESEARCH.md](eight-card/LANE-RESEARCH.md) | Where the time of a decode round goes on the eight-card NVFP4 build. Also published in [Volta Max uPLIft](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4/blob/main/docs/research/LANE-RESEARCH.md) | 2026-11-09 |
+| [LANE-RESEARCH.md in Volta Max uPLIft](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4/blob/main/docs/research/LANE-RESEARCH.md) | Where the time of a decode round goes on the eight-card NVFP4 build. Published in that build's repository; not copied here | 2026-11-09 |
 | [eight-card/topk-full-20261110.md](eight-card/topk-full-20261110.md) | The full cost of the index top-k kernels per decode round, measured on one card of a four-card test machine | 2026-11-10 |
 
-The twelve-card time budget is summarised in
-[../optimizations/volta-12x-amplify.md](../optimizations/volta-12x-amplify.md#where-the-time-goes).
+The twelve-card time budget is [in that build's repository](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4/blob/main/research/TWELVE-CARD-TIME-BUDGET.md) and
+summarised in [../optimizations/volta-12x-amplify.md](../optimizations/volta-12x-amplify.md#where-the-time-goes).
 
 ## Upstream sweeps
 
@@ -80,4 +80,4 @@ ended at about 3 tok/s and an overall FAIL of its exactness gates, and it is dir
 | The lever log of the eight-card build | already public | [Volta sPLIt, docs/levers.md](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/blob/main/docs/levers.md) |
 | The June 2026 notes on the serving stack and on serving larger models | they describe one machine's inventory in detail; their conclusions were published at the time | [pli-labs, research/v100](https://github.com/ProprietaryLegal/pli-labs/tree/main/research/v100) |
 | The long working logs of individual kernel experiments, the kernel campaign on the test machine, the hardware inventory | working logs tied to one machine. Their results are in the build pages | [../optimizations/](../optimizations/README.md) |
-| The twelve-card build's plan, measurements and time budget | the build's repository is not yet published | summarised in [../optimizations/volta-12x-amplify.md](../optimizations/volta-12x-amplify.md) |
+| The twelve-card build's measurements, history, kernel plan and time budget | published in the build's own repository | [Volta 12X AmPLIfy](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4); summarised in [../optimizations/volta-12x-amplify.md](../optimizations/volta-12x-amplify.md) |

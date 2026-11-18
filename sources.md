@@ -20,7 +20,7 @@ notes under [research/](research/README.md) carry their own reference lists, the
 | [pli-labs, research/v100](https://github.com/ProprietaryLegal/pli-labs/tree/main/research/v100) and its [July 2026 case study](https://github.com/ProprietaryLegal/pli-labs/blob/main/research/v100/serving-optimization-2026-07/README.md) | The earlier V100 notes |
 | Hugging Face [deepseek-v4.1-flash-sm70](https://huggingface.co/ProprietaryLegal/deepseek-v4.1-flash-sm70), [sm70-fp8-block32-kernels](https://huggingface.co/ProprietaryLegal/sm70-fp8-block32-kernels) | The record of the first twelve-card port and its FP8 kernels |
 | [DGX sPLIce](https://github.com/ProprietaryLegal/DGX-sPLIce-DeepSeek-V4.1-Flash-2xDGX-Spark-2xRTX3090-drafter-x86-offload), [dsv41-window-harness](https://github.com/ProprietaryLegal/dsv41-window-harness) | The sister build on DGX Sparks and its fenced-window harness |
-| The private working record of Volta 12X AmPLIfy | Every twelve-card figure. Not yet published; this repository says so wherever it is used |
+| [Volta 12X AmPLIfy](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4): README, [docs/measurements.md](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4/blob/main/docs/measurements.md), [docs/history.md](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4/blob/main/docs/history.md), [the time budget](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4/blob/main/research/TWELVE-CARD-TIME-BUDGET.md), [kit/](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4/tree/main/kit) | Every twelve-card figure; the three-stage engine change; where the time goes |
 
 ## Engines and kernels
 
@@ -59,11 +59,13 @@ notes under [research/](research/README.md) carry their own reference lists, the
 
 | Source | Used for |
 |---|---|
-| The founder's post to r/homelab, 2026-11-05: <https://www.reddit.com/r/homelab/comments/1xoumr9/> | The cost of the cards and boards; the hardware faults; the driver branch. Quoted in part 8 of the front page |
+| The founder's public posts and comments on Reddit, February to November 2026: the board post of [2026-03-11](https://www.reddit.com/r/LocalLLaMA/comments/1rql2f3/4_32_gb_sxm_v100s_nvlinked_on_a_board_best_budget/), the hardware updates of [2026-11-05](https://www.reddit.com/r/homelab/comments/1xoumr9/lawyers_v100_homelab_update_two_4card_sxm2_nvlink/) and [2026-11-12](https://www.reddit.com/r/homelab/comments/1xusbar/lawyers_v100_homelab_update_2_the_8x_v100_box_now/), and the comments linked where they are quoted | Prices as paid, the power measurement, cooling, the hardware faults, the driver branch. Quoted in part 8 of the front page and in [hardware.md](hardware.md) |
+| eBay listings of the parts (each linked in [hardware.md](hardware.md) beside a search link) | What each part is and what was paid for it in 2026 |
 | Tom's Hardware, 2026-11-09: [Lawyer builds private AI server with eight used Nvidia V100 GPUs](https://www.tomshardware.com/tech-industry/artificial-intelligence/lawyer-builds-private-ai-server-with-eight-used-nvidia-v100-gpus-up-to-215-tokens-per-second-to-keep-legal-files-offline-costing-about-usd2-400-per-four-gpu-board) | Independent coverage of the eight-card build |
 | TechCrunch, 2025-02-21: [Sakana walks back claims that its AI can dramatically speed up model training](https://techcrunch.com/2025/02/21/sakana-walks-back-claims-that-its-ai-can-dramatically-speed-up-model-training/) | Why AI-written kernels need adversarial tests |
 
 ## The skill
 
 [PLI Volta Builder](https://github.com/ProprietaryLegal/pli-volta-builder): the method of this repository packaged
-for coding agents.
+for coding agents. Its optimization loop is borrowed, with credit, from the hill-climbing scripts at
+<https://github.com/0xsero>.

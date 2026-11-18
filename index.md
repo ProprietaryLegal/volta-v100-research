@@ -6,6 +6,42 @@ Built by **Nick Mermiges, Esq.**, founder of [PLI Labs](https://proprietarylegal
 MEASURED (on our hardware, with its conditions), UPSTREAM (someone else's, linked) or ESTIMATE (arithmetic), and
 links to its source. The failures are told as plainly as the wins.*
 
+This is the long read at the front of PLI Labs' Volta research. It explains the Tesla V100's architecture and how it
+compares with newer chips, how the 1Cat-vLLM community made it serve current models, every speed optimization we
+made in four builds of DeepSeek-V4.1-Flash on eight and twelve V100s (with the ones that lost), how each was tested,
+when each is likely to apply to another machine, how to write a kernel for this chip, and what the hardware costs,
+gives and takes, with a parts list.
+
+## Contents
+
+| Section | What is in it |
+|---|---|
+| [The four builds in numbers](#the-four-builds-in-numbers) | tok/s for decode, prefill and concurrent requests, the KV cache, figures at 128K of context |
+| [What you can use from this page](#what-you-can-use-from-this-page) | the six points to take away |
+| [Part 1: Volta's architecture](#part-1-voltas-architecture) | FP16-only tensor cores, fast HBM2, NVLink inside a board, PCIe between boards |
+| [Part 2: How it compares with newer chips](#part-2-how-it-compares-with-newer-chips) | what each generation added, and what a 4-bit format buys on a card with no 4-bit hardware |
+| [Part 3: How it was made to work under 1Cat-vLLM](#part-3-how-it-was-made-to-work-under-1cat-vllm) | who built what; pipeline stages of tensor-parallel cards |
+| [Part 4: Every optimization, build by build](#part-4-every-optimization-build-by-build) | one table per build: what it gave, what it cost, whether it changes answers; the losers too |
+| [Part 5: The whole process of testing](#part-5-the-whole-process-of-testing) | rules before data, fenced windows, two judges, what went wrong |
+| [Part 6: When an optimization is likely to apply](#part-6-when-an-optimization-is-likely-to-apply) | a decision table keyed on your cards, your context and your requests |
+| [Part 7: How to build a custom kernel for sm_70](#part-7-how-to-build-a-custom-kernel-for-sm_70) | sizing, the order of attack, the numerics contract, what does not port |
+| [Part 8: The hardware, what it costs and what it gives](#part-8-the-hardware-what-it-costs-and-what-it-gives) | prices, power, drawbacks in the founder's own words; [the hardware list](hardware.md) |
+| [Part 9: The builder skill](#part-9-the-builder-skill) | the method packaged for coding agents |
+| [Part 10: Every final build and every source](#part-10-every-final-build-and-every-source) | links |
+
+## The four builds in numbers
+
+Each card is one build on its own hardware, measured under its own conditions, and links to that build's
+repository. The conditions, the context and KV cache figures and the accuracy of each are in [builds.md](builds.md).
+
+[![Volta 12X AmPLIfy: 12x V100-SXM2-32GB; decode 130 tok/s for one request on fresh text, 179 when copying text; prefill 3,833 tok/s on a 93K-token prompt, 3,316 at 248K, 2,454 at 426K; four requests together 312 tok/s in sum; KV cache: 524K tokens of context per request, four slots](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-12x-amplify.svg)](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4)
+
+[![Volta Max uPLIft: 8x V100-SXM2-32GB; at 128K context: decode 148 tok/s on code, 146 on JSON, 79 on legal text, 77 on prose; prefill 2,727 to 3,145 tok/s, first token after 43.8 s; three requests together 176 tok/s, same tokens as each alone; KV cache: 524K tokens of context per request, two slots, a follow-up resumes in 0.69 s](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-max-uplift.svg)](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4)
+
+[![Volta sPLIt: 8x V100-SXM2-32GB; at 128K context: decode 183 tok/s on code, 197 on JSON, 111 on legal text, 91 on prose; prefill 2,200 tok/s, first token after 59 s; one request at a time; KV cache: 524K tokens of context per request](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-split.svg)](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4)
+
+[![Volta Full NVFP4: 8x V100-SXM2-32GB plus host RAM; decode 28 to 30 tok/s on legal-style text; prefill 1,419 to 1,595 tok/s, a 498K-token prompt read in 326.6 s; one request at a time; KV pool 2.08M tokens, 524K context per request](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-full-nvfp4.svg)](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100)
+
 ## What you can use from this page
 
 A Tesla V100 is a datacenter GPU from 2017. Four of them on an NVLink board hold 128 GB of fast memory and cost
@@ -13,9 +49,10 @@ about $2,400 used when we bought ours ([part 8](#part-8-the-hardware-what-it-cos
 is what seventeen days of work on eight and then twelve of them taught us, with DeepSeek-V4.1-Flash-1017, a
 40-layer mixture-of-experts model:
 
-- **It works, and it is fast enough to use.** On eight cards, MEASURED 2026-11-05: 215 tok/s writing code and 118
-  tok/s writing legal text after a 1K prompt, 2,200 tok/s reading a 128K prompt, 524K tokens of context
-  ([Volta sPLIt](builds.md#volta-split)).
+- **It works, and it is fast enough to use.** On eight cards, MEASURED 2026-11-05: at 128K tokens of context,
+  183 tok/s writing code and 111 tok/s writing legal text; 2,200 tok/s reading the prompt; 524K tokens of context
+  per request ([Volta sPLIt](builds.md#volta-split)). On twelve cards, every expert at NVFP4 precision: 128 tok/s
+  for one request and 3,833 tok/s reading a 93K prompt ([Volta 12X AmPLIfy](builds.md#volta-12x-amplify)).
 - **Most of that speed is other people's work**, chiefly the [1Cat-vLLM](https://github.com/1CatAI/1Cat-vLLM) fork
   and the [v100-skinny](https://github.com/dnv2003/v100-skinny) kernels. [Part 3](#part-3-how-it-was-made-to-work-under-1cat-vllm)
   says who did what.
@@ -32,7 +69,7 @@ is what seventeen days of work on eight and then twelve of them taught us, with 
 The four builds, with links and headline numbers, are in [builds.md](builds.md). If you only want to know whether
 an idea applies to your machine, go to the [decision table](method/decision-table.md).
 
-![The build family tree: other people's engines, PLI Labs' earlier builds, and the four Volta builds](assets/family-tree.svg)
+![The build family tree: other people's work, PLI Labs' earlier builds, and the four Volta builds](assets/family-tree.svg)
 
 ## Part 1: Volta's architecture
 
@@ -139,7 +176,7 @@ for three.
 fresh text it then ran at 25 tok/s against 97 warm, because of the fetches (MEASURED on one of our boards,
 [source](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/blob/main/docs/four-card.md)).
 Putting the second half of the model on a second board means no expert is ever fetched. That is Volta sPLIt:
-99 tok/s on the day of the port, before any optimization, where our previous engine gave 42 to 46.
+99 tok/s on the day of the port, before any optimization.
 
 **Long context** comes from the model and the package: packed key-value storage with a ring of recent positions on
 the cards and the rest in host memory; prompts read in chunks of 8,192 tokens; a prefix cache. We measured needle
@@ -182,9 +219,10 @@ MEASURED 2026-11-09, clock ceiling 1,522 MHz.
 |---|---|---|
 | Folding NVIDIA's NVFP4 pack to MXFP4 | 44,696,862,720 values bit-equal | exact |
 | Experts split between the cards and host RAM | bit-equal to all on one card | exact |
-| *Lost:* reading experts from host RAM in decode | about 975 microseconds per expert per layer; **28 to 30 tok/s** where Volta sPLIt gives 118 | - |
+| Per-stage card reserves from sampled peaks | a 498,099-token prompt reads in 326.6 s with no out-of-memory error | - |
+| *Lost:* reading experts from host RAM in decode | about 975 microseconds per expert per layer; the build decodes at **28 to 30 tok/s** on legal-style text | - |
 
-This build is the reference the others are compared with. Its lesson is the number in the last row.
+This build exists to give an all-NVFP4 output to check other work against. Its lesson is the number in the last row.
 
 ### Volta Max uPLIft (eight cards, the most-used experts native) · [full table](optimizations/volta-max-uplift.md)
 
@@ -193,28 +231,29 @@ row.
 
 | Optimization | Gave | Cost | Answers |
 |---|---|---|---|
-| Promote experts to native precision in order of use per byte, all on the cards | 6,087 of 15,360 experts native; 79 to 85 % of decode routes on them; 95.1 % same next token as the all-native reference, where Volta sPLIt has 92.2 % | decode slower than Volta sPLIt | rounding: closer to the reference, by a preregistered test |
+| Promote experts to native precision in order of use per byte, all on the cards | 6,087 of 15,360 experts native; 79 to 85 % of decode routes on them; the same next token as NVIDIA's NVFP4 pack on 95.1 % of compared tokens | card memory: every slot and every reserve costs native experts | rounding: measured by a preregistered closeness test |
 | No host tier at all | general text 58 to 59 ms per round down to 33.4 | - | - |
 | Group-plan kernel (one launch in place of a chain of tensor operations) | **-4.9 ms per round** | none | bitwise |
 | Snapshot of the sliding-window state per slot | a follow-up after a changed reply: **0.69 s in place of 31 s** at 100K | 82 MB of host memory | identical to an ordinary cache hit |
-| Prompt slots (two by default) | two together 1.33 times one stream; three 1.48 times | 267 to 553 fewer native experts; **quality not established** | identical to the same prompt alone |
+| Prompt slots (two by default) | two together 158.7 tok/s (1.33 times one stream); three together 176.2 (1.48 times) | 267 to 553 fewer native experts; **quality not established** | identical to the same prompt alone |
 | Fast prompt reading from compressed records | first read near 200K: 86 to 119 s where native reading took 155 to 165 s | **changes output from the first token; quality not established** | changes |
 | *Lost:* a new decode kernel; 64 rows per weight load; a remote drafter | 0.000 ms predicted; slower; 42.6 ms per round against a 4.5 ms bar | - | - |
 
 ### Volta 12X AmPLIfy (twelve cards, every expert native, all on the cards) · [full table](optimizations/volta-12x-amplify.md)
 
-MEASURED 2026-11-17 on a twelve-V100 server, 150 W per card unless the row says 200 W, clock ceiling 1,477 MHz.
-The build's repository is not yet published; these figures come from its private working record.
+MEASURED 2026-11-17 and early 2026-11-18 on a twelve-V100 server, 150 W per card unless the row says 200 W, clock
+ceiling 1,477 MHz ([source](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#measured)).
 
 | Change | Gave | Cost | Answers |
 |---|---|---|---|
-| A third pipeline stage on the fast engine | every expert native on the cards; first divergence from the all-native reference after a median of 208 tokens, where the eight-card build diverges after 7 | one request is no faster than on eight cards (128 tok/s) | rounding: closer |
+| A third pipeline stage on the fast engine | every one of the 15,360 routed experts at NVFP4 precision in card memory; first divergence from an all-native reference after a median of 208 tokens | a third stage does not make one request faster: 128 tok/s | rounding: measured by closeness |
 | Scheduler spacing for three stages | without it **15 of 15 answers were wrong** | none | it is a correctness fix |
-| Prompt chunks of 4,092 rows | room for a third and fourth slot | reading 4 % slower | rounding |
-| Four slots | four chats kept warm; three together 288 tok/s summed, where the eight-card build gave 198 | a fourth request adds only 6 %: a pipeline step carries one request | identical |
-| 200 W in place of 150 W | prompt reading +13.7 % (3,284 to 3,733 tok/s) | power; decode unchanged | none |
-| Release the allocator's cache only above the chunk size | reading **+12.6 % at 61K, +9.9 % at 93K** (200 W, one run) | none found | identical |
-| *Lost:* one stage on eight cards with no pipeline | one request -3 %, three at once -41 %, long reads -26 % | - | - |
+| Prompt chunks of 4,092 rows | room for a third and fourth slot | prefill 4 % slower | rounding |
+| Four slots | four chats kept warm; three together 288.0 tok/s summed, four together 306.6 (242.6 by wall clock) | a fourth request adds only 6 %: a pipeline step carries one request | identical |
+| 200 W in place of 150 W | prefill +13.7 % (3,284 to 3,733 tok/s) | power; decode unchanged | none |
+| Release the allocator's cache only above the chunk size (tested, not yet serving) | prefill **+12.6 % at 61K, +9.9 % at 93K** (200 W, one boot) | none found | identical |
+| A conversation store: a chat's state saved to disk (tested, not yet serving) | a 131,466-token turn back after a restart in **1.23 s** where a cold read took 43.84 s | - | not token-identical to a cold read |
+| *Lost:* one stage on the same eight cards with no pipeline (one test window) | one request -3 %, three at once -41 %, long reads -26 % | - | - |
 
 ### Earlier builds · [full page](optimizations/earlier-builds.md)
 
@@ -311,48 +350,74 @@ overhead per layer, not arithmetic. One seventh is outside any kernel.
 
 ## Part 8: The hardware, what it costs and what it gives
 
-In the founder's own words, from his post to r/homelab on 2026-11-05
-([link](https://www.reddit.com/r/homelab/comments/1xoumr9/)):
+The parts list, with what was paid for each part, links, cooling options and photos, is its own page:
+**[the hardware list](hardware.md)**. This part is the argument for and against, mostly in the founder's own public
+words.
+
+**The idea.** From [his post of March 2026](https://www.reddit.com/r/LocalLLaMA/comments/1rql2f3/4_32_gb_sxm_v100s_nvlinked_on_a_board_best_budget/):
+
+> Buy 4 32gb v100 sxm cards/heatsinks for 1600, get the aom sxm board and pex card for 750. That's 128gb of unified
+> nvlink vram for 2400.
+
+and from [the hardware update of November 2026](https://www.reddit.com/r/homelab/comments/1xoumr9/lawyers_v100_homelab_update_two_4card_sxm2_nvlink/):
 
 > The core idea, which I've been banging on about for a while: SXM2 V100s on 4-card NVLink boards are still the
 > cheapest big pool of fast VRAM I know of.
 
-> What it cost me: when I bought in, four 32 GB SXM2 cards with heatsinks ran about $1,600, and the board plus PEX
-> card about $750. Call it $2,400 for 128 GB of NVLinked VRAM. Those were the prices then; check eBay and Alibaba
-> before you trust me.
+<p><img src="assets/photos/four-card-board-duct-fan.jpg" alt="A four-card SXM2 NVLink board under the inline duct fan that cools it" width="520"></p>
 
-The warning in his last sentence was needed. Tom's Hardware, reporting the build on 2026-11-09, found that "used V100
-SXM2 32GB cards are now listed on eBay for about $900, more than double the roughly $400 apiece from the post, and
-listings suggest prices are still climbing"
+*One four-card board: 128 GB, NVLink between the four cards, cooled by a duct fan from above.*
+
+**What you buy**, in short ([full list with links](hardware.md#the-parts)):
+
+| Part | For one four-card board | Paid in 2026 |
+|---|---|---|
+| Tesla V100-SXM2-32GB modules | 4 | $454 to $490 each in February and March; $679 in September |
+| Four-card SXM2 NVLink baseboard | 1 | $785 in March; $853 to $882 from June |
+| PCIe switch card with SlimSAS ports, and SlimSAS cables | 1 or 2 cards, 4 cables | $126 to $221 a card (PCIe 3.0); $529 for a PCIe 4.0 card that takes two boards |
+| Heatsinks, thermal paste | 4 | $48 to $97 each when not sold with the card |
+| A power supply with enough PCIe 8-pin cables | 1 | $73 for a 2,000 W unit |
+| A blower or a server chassis | 1 | a duct fan, or $311 for a 4U chassis |
+| A host with a free x16 slot per switch card, and ECC memory | | a 12-core workstation CPU and board, about $680 together in March |
+
+**What it cost, and what it costs now.** The eight-card machine, in his words in November
+([comment](https://www.reddit.com/r/homelab/comments/1xusbar/lawyers_v100_homelab_update_2_the_8x_v100_box_now/19sn8jhhqo59f/)):
+"When I built it, about 5k. Maybe 450/v100, 800 per board. Now, probably 9-10k." Tom's Hardware, reporting the
+build on 2026-11-09, found that "used V100 SXM2 32GB cards are now listed on eBay for about $900, more than double
+the roughly $400 apiece from the post, and listings suggest prices are still climbing"
 ([article](https://www.tomshardware.com/tech-industry/artificial-intelligence/lawyer-builds-private-ai-server-with-eight-used-nvidia-v100-gpus-up-to-215-tokens-per-second-to-keep-legal-files-offline-costing-about-usd2-400-per-four-gpu-board)).
-At that listing a board of four is about $4,350 (ARITHMETIC: four cards at $900 plus $750 for the board and switch
-card, if that part's price held). The value argument is weaker than it was a year ago, and it moves with the
-used market.
+The value argument is weaker than it was in March, and it moves with the used market.
 
 **What it gives.** 128 GB of card memory per board at 900 GB/s per card, with NVLink between the four. Two boards
-ran a 249 GB model with every expert in card memory, at speeds a person can work at. The data never leaves the
-room.
+run a 249 GB model with every expert in card memory at speeds a person can work at; three boards run it with every
+expert at the precision of NVIDIA's NVFP4 pack. The data stays in the room.
 
-**What it costs beyond the price.** The drawbacks, each from the record:
+**What it takes.** The drawbacks, each from the record:
 
 | Drawback | The fact |
 |---|---|
-| **Power** | MEASURED 2026-11-05 on eight cards at a 150 W cap (card and CPU-package counters, no wall meter): idle 458 W for the cards alone (about 57 W a card, doing nothing); decode about 1.1 kW; prompt reading about 1.0 kW. Twelve cards at a 200 W cap are a budget of 2.4 kW for the cards (ARITHMETIC). The eight-card machine was built on two office circuits, 2,800 W of supply |
-| **Heat and noise** | The same kilowatt comes out as heat. SXM2 cards are passive datacenter modules that need forced air. We have no noise measurement to give you |
-| **Age and the used market** | 2018 cards, bought used, at prices that have more than doubled (above). From the post: "One GPU board's power connection had a burn mark. That board came out of the box. Check your connectors, people." One card linked at x4 where x8 was expected. A higher power limit with uncapped clocks coincided with two host resets from PCIe completion timeouts; a later series of faults stopped after the host's power delivery was changed |
-| **No FP8 or FP4 tensor cores** | Every low-bit format is unpacked in software ([part 2](#part-2-how-it-compares-with-newer-chips)). Prompt reading suffers most: 2,200 to 3,700 tok/s here. On a 27B model, v100-skinny measured prompt reading about four times slower on four V100s than on one RTX 5090, at equal decode speed (UPSTREAM) |
-| **PCIe and NVLink topology** | NVLink only inside a board of four. Everything larger is pipeline stages over PCIe Gen3, and the layout rules in [part 3](#part-3-how-it-was-made-to-work-under-1cat-vllm) are not optional. One request does not get faster with more boards |
-| **Host memory matters too** | From the post: "One memory channel threw four uncorrected ECC errors, three of them while loading the model". The cure was a lower memory speed. The Engram tables alone want 110 GB of RAM, resident |
-| **Driver and CUDA support are ending** | From the post: "NVIDIA R580, the last driver branch that still supports Volta. These cards are on borrowed time software-wise and I've made peace with that." CUDA 13.0 removed Volta from its compiler; PyTorch keeps it only in CUDA 12.6 builds ([announcement](https://dev-discuss.pytorch.org/t/dropping-volta-support-from-cuda-12-8-binaries-for-release-2-11/3290)); upstream vLLM dropped it. You will be pinning versions and living on a fork |
+| **Power** | MEASURED on eight cards at a 150 W cap, from card and CPU counters with no wall meter ([his comment of 2026-11-06](https://www.reddit.com/r/LocalLLaMA/comments/1xoubyo/lawyer_with_too_many_gpus_part_4_deepseekv41flash/19s7cc0y1hxdu/)): "Idle: GPUs 458 W (about 57 W a card, yes it hurts) [...] Decode: GPUs about 965 W, CPU about 150 W, so about 1.1 kW". His bill: "Abt $80/month in power" at $0.16 per kWh. Twelve cards at a 200 W cap are a budget of 2.4 kW for the cards (ARITHMETIC). (An earlier comment of his gave 35 W idle per card; the measurement is later and governs.) |
+| **Heat** | The same kilowatt leaves as heat: "they draw power. And throw off a lot of heat so they need their own room" ([comment](https://www.reddit.com/r/LocalAIServers/comments/1xouorj/8x_v100sxm232gb_in_late_2026_doing_real_work/19s7ixfgfphya/)) |
+| **Cooling and noise** | The modules have no fans. "V100s work, but are less practical in that they require active cooling and a good bit more power" ([comment](https://www.reddit.com/r/LocalLLM/comments/1xoujte/crazy_ai_lawyer_deepseekv41flash_on_eight_2018/19s76vjl79ajo/)). A blower or a server chassis does it; neither is quiet, and we have no noise measurement to give you ([cooling options](hardware.md#cooling-options)) |
+| **Age and the used market** | 2018 cards, bought used, at prices that more than doubled in 2026. "One GPU board's power connection had a burn mark. That board came out of the box. Check your connectors, people." Two host resets under load before the clocks were capped; a later run of faults that was probably one bad power supply ([what goes wrong](hardware.md#what-goes-wrong)) |
+| **No FP8 or FP4 tensor cores** | Every low-bit format is unpacked in software ([part 2](#part-2-how-it-compares-with-newer-chips)). Prompt reading suffers most: 2,200 to 3,850 tok/s here. On a 27B model, v100-skinny measured prompt reading about four times slower on four V100s than on one RTX 5090, at equal decode speed (UPSTREAM) |
+| **PCIe and NVLink topology** | NVLink only inside a board of four. "v100s are stuck at pcie3. 4 card board max out at x8" ([comment](https://www.reddit.com/r/homelab/comments/1xoumr9/lawyers_v100_homelab_update_two_4card_sxm2_nvlink/19s73lsd7uchs/)). Everything larger is pipeline stages over PCIe, and the layout rules of [part 3](#part-3-how-it-was-made-to-work-under-1cat-vllm) are not optional |
+| **Host memory matters too** | "One memory channel threw four uncorrected ECC errors, three of them while loading the model". The cure was a lower memory speed. The model's lookup tables alone want 110 GB of RAM, resident |
+| **Driver and CUDA support are ending** | "NVIDIA R580, the last driver branch that still supports Volta. These cards are on borrowed time software-wise and I've made peace with that." CUDA 13.0 removed Volta from its compiler; PyTorch keeps it only in CUDA 12.6 builds ([announcement](https://dev-discuss.pytorch.org/t/dropping-volta-support-from-cuda-12-8-binaries-for-release-2-11/3290)); upstream vLLM dropped it. You will pin versions and live on a fork |
 | **Your time** | Seventeen days of daily work, with coding agents, to get from "it runs" to these numbers. The builder skill below exists to shorten that |
 
-Per token, from the same measurement (cards and CPU only, one request at a time): reading a 64K to 128K prompt
-costs about 0.13 kWh per million tokens; writing costs about 1.6 kWh per million tokens of code, 2.7 of legal
-writing and 3.5 of prose, because a round costs the same energy however many drafted tokens it keeps.
+Per token, from the same measurement (cards and CPU only, one request at a time): "uncached input is about 0.13 kWh
+per 1M tokens on 64K-128K prompts [...] code at about 200 tok/s is about 1.6 kWh per 1M output tokens, legal
+writing at about 115 tok/s about 2.7 kWh, prose at about 90 tok/s about 3.5 kWh." A decode round costs the same
+energy however many drafted tokens it keeps.
 
-**Who it suits.** Someone who needs a large open model on their own premises, values memory per dollar over
-speed per watt, can pin software versions, and can live with one or a few users. It does not suit anyone who needs
-many concurrent users, a quiet room, or a vendor to call.
+**Who it suits.** Someone who needs a large open model on their own premises, values memory per dollar over speed
+per watt, can pin software versions, and serves one or a few users. It does not suit anyone who needs many
+concurrent users, a quiet room, or a vendor to call. His own second thought, from
+[a comment of May 2026](https://www.reddit.com/r/LocalLLaMA/comments/1tnn29i/update_on_12x32gb_sxm_v100_cluster_local_ai_for/oo2rv5s/):
+"If i was starting over I guess maybe I would have gotten two 80gb a100s and an nvlink to start. But these I could
+buy 2-3 at a time [...] I am positive newer architecture is easier and runs better. I wasted money on the way. But
+I can't say these were a stupid decision at least."
 
 ## Part 9: The builder skill
 
@@ -360,24 +425,27 @@ many concurrent users, a quiet room, or a vendor to call.
 <https://github.com/ProprietaryLegal/pli-volta-builder>. It carries the research context and the rules of this
 repository, and runs the same campaign in order: read upstream first; do the layout arithmetic; bring up a proven
 recipe; build a test harness with strict judges; measure a time budget; test one change per boot under a rule
-written before its data; write `sm_70` kernels by the kernel guide; ask for an independent review; research the next lever; publish
-the losses with the wins. It builds nothing a person could not; it keeps an agent from skipping the steps above.
+written before its data; write `sm_70` kernels by the kernel guide; ask for an independent review; research the
+next lever; publish the losses with the wins. Its automated optimization loop is borrowed, with credit, from the
+hill-climbing scripts published at <https://github.com/0xsero>. It builds nothing a person could not; it keeps an
+agent from skipping the steps above.
 
 ## Part 10: Every final build and every source
 
-**The builds** ([details and numbers](builds.md)):
+**The builds** ([numbers](builds.md)):
 
-- [Volta sPLIt](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4): eight cards, compressed experts, the fastest decode.
+- [Volta 12X AmPLIfy](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4): twelve cards, every routed expert at NVFP4 precision on the cards.
 - [Volta Max uPLIft](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4): eight cards, the most-used experts at NVFP4 precision. [Hugging Face package](https://huggingface.co/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-hot_iq-8xV100-SXM2-PP2xTP4).
-- [Volta Full NVFP4](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100): eight cards, every expert at NVFP4 precision, the reference.
-- Volta 12X AmPLIfy: twelve cards, every expert at NVFP4 precision on the cards. Repository not yet published.
+- [Volta sPLIt](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4): eight cards, compressed experts, all on the cards.
+- [Volta Full NVFP4](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100): eight cards, every expert at NVFP4 precision, the overflow in host RAM.
 - Earlier: [deepseek-v4-flash-v100](https://github.com/ProprietaryLegal/deepseek-v4-flash-v100), [swift-1.5-v100](https://github.com/ProprietaryLegal/swift-1.5-v100), [deepseek-v4.1-v100](https://github.com/ProprietaryLegal/deepseek-v4.1-v100) (a mirror of Phil Tompkins' engine), [the V100 notes in pli-labs](https://github.com/ProprietaryLegal/pli-labs/tree/main/research/v100).
-- Sister work on two DGX Sparks, a different chip with a different bottleneck: [DGX sPLIce](https://github.com/ProprietaryLegal/DGX-sPLIce-DeepSeek-V4.1-Flash-2xDGX-Spark-2xRTX3090-drafter-x86-offload).
+- Sister work on two DGX Sparks, a different chip: [DGX sPLIce](https://github.com/ProprietaryLegal/DGX-sPLIce-DeepSeek-V4.1-Flash-2xDGX-Spark-2xRTX3090-drafter-x86-offload).
 
-**In this repository:** [builds.md](builds.md) · [optimizations/](optimizations/README.md) ·
-[what did not work](optimizations/what-did-not-work.md) · [the testing method](method/testing.md) ·
-[the kernel guide](method/kernel-building.md) · [the decision table](method/decision-table.md) ·
-[the source research](research/README.md) · [every external source](sources.md) · [credits](CREDITS.md).
+**In this repository:** [builds.md](builds.md) · [the hardware list](hardware.md) ·
+[optimizations/](optimizations/README.md) · [what did not work](optimizations/what-did-not-work.md) ·
+[the testing method](method/testing.md) · [the kernel guide](method/kernel-building.md) ·
+[the decision table](method/decision-table.md) · [the source research](research/README.md) ·
+[every external source](sources.md) · [credits](CREDITS.md).
 
 **Upstream, where the work that matters most lives:** [1Cat-vLLM](https://github.com/1CatAI/1Cat-vLLM) ·
 [v100-skinny](https://github.com/dnv2003/v100-skinny) · [vLLM](https://github.com/vllm-project/vllm).

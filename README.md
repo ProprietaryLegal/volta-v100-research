@@ -16,6 +16,7 @@ engines: the code of each build lives in that build's own repository, linked fro
 |---|---|
 | [index.md](index.md) | The post: Volta's architecture, how it compares with newer chips, how it was made to work under 1Cat-vLLM, every optimization, the testing method, when each optimization applies, how to build a kernel, the hardware and its drawbacks |
 | [builds.md](builds.md) | Every final build with its link, what it runs on and its headline measured numbers |
+| [hardware.md](hardware.md) | The hardware list: every part of a four-card SXM2 NVLink board and its host, what was paid, links, cooling options, photos, what goes wrong |
 | [optimizations/](optimizations/README.md) | One page per build with its full table of what was adopted and what lost; [what-did-not-work.md](optimizations/what-did-not-work.md) across all builds |
 | [method/testing.md](method/testing.md) | The testing method as a reusable document, including what went wrong with it |
 | [method/kernel-building.md](method/kernel-building.md) | How to build a custom kernel for sm_70 |
@@ -29,10 +30,10 @@ engines: the code of each build lives in that build's own repository, linked fro
 
 | Build | Cards | Routed experts | Repository |
 |---|---|---|---|
-| Volta sPLIt | 8 | compressed, all on the cards: the fastest decode | [link](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4) |
+| Volta sPLIt | 8 | compressed (2-bit), all on the cards | [link](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4) |
 | Volta Max uPLIft | 8 | the most-used at NVIDIA's NVFP4 precision, all on the cards | [link](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4) |
-| Volta Full NVFP4 | 8 | all at NVFP4 precision, the overflow in host RAM: the reference | [link](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100) |
-| Volta 12X AmPLIfy | 12 | all at NVFP4 precision, all on the cards | not yet published |
+| Volta Full NVFP4 | 8 | all at NVFP4 precision, the overflow in host RAM | [link](https://github.com/ProprietaryLegal/Volta-Full-NVFP4-DeepSeek-V4.1-Flash-8xV100) |
+| Volta 12X AmPLIfy | 12 | all at NVFP4 precision, all on the cards | [link](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4) |
 
 ## How to read the numbers
 
