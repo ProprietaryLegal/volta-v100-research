@@ -361,7 +361,8 @@ overhead per layer, not arithmetic. One seventh is outside any kernel.
 
 ## Part 8: The hardware, what it costs and what it gives
 
-The parts list, with rough prices, search links, cooling options and photos, is its own page:
+The parts list, with a link for every part, rough prices, the steps to build it, cooling options and photos, is its
+own page:
 **[the hardware list](hardware.md)**. This part is the argument for and against, mostly in the founder's own public
 words.
 
