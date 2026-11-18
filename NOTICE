@@ -1,0 +1,22 @@
+PLI Labs: Volta V100 research
+Copyright 2026 Proprietary Legal Intelligence LLC
+
+Original PLI Labs documentation, diagrams and code in this repository are licensed under Apache-2.0 (LICENSE).
+
+This repository holds documents, not engines. It distributes no model weights, packs, wheels, compiled libraries,
+routing data or prompt corpora, and it copies no third-party source file.
+
+Third-party work described, quoted or linked here remains under its own licence:
+- 1CatAI/1Cat-vLLM and vllm-project/vllm (Apache-2.0): the serving engine and its SM70 work. Pull requests are
+  linked, and short passages of their descriptions are quoted with their authors named.
+- dnv2003/v100-skinny by Dennis Vertzyas (MIT for kernels and documents, Apache-2.0 for fork patches): kernel
+  designs and measurements are summarised and attributed in research/ and in CREDITS.md. Its source is not copied.
+- DeepSeek (MIT): DeepSeek-V4.1-Flash-1017, the DSpark drafter and the Engram design.
+- NVIDIA (MIT for the model pack): DeepSeek-V4.1-Flash-1017-NVFP4. NVIDIA's tuning guides and whitepapers are
+  cited, not reproduced.
+- ISTA-DASLab (MIT): the GSQ-RCO GGUF quantization.
+
+Files under research/ are PLI Labs' own research notes. Each states its origin and what was removed for
+publication at its top. Figures in those notes that come from other people's work carry their source.
+
+See CREDITS.md for every project and person this work builds on.

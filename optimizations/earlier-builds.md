@@ -1,0 +1,87 @@
+# The earlier V100 builds: what each one found
+
+These came before Volta sPLIt. Each is a public repository with its own measurements; this page lists what each
+contributed to the later builds, with the number and the link. Nothing here was measured for this page, and each
+row's conditions are those of its source.
+
+## DeepSeek-V4-Flash on eight V100s with llama.cpp (July 2026)
+
+Repository: <https://github.com/ProprietaryLegal/deepseek-v4-flash-v100>
+
+| Finding | Number (MEASURED, eight V100-SXM2-32GB, 245 W per card, llama.cpp layer split) | Source |
+|---|---|---|
+| The model runs, slowly | 12.2 tok/s generation, 209 tok/s prompt reading at 8K, 4-bit GGUF | [README, headline numbers](https://github.com/ProprietaryLegal/deepseek-v4-flash-v100#headline-numbers) |
+| Batch settings `-b 2048 -ub 1024` | +5 to 6 % generation over the initial settings | same |
+| **A quantized key cache silently corrupts output** | With `--cache-type-k q8_0` the model loads, reports healthy and writes confident nonsense, with no error. First blamed on a Volta kernel; that was disproved (it reproduces on a CPU). The cause is a rotation that llama.cpp enables for quantized key caches, which diverts this architecture off its sparse attention path. Fix: an FP16 key cache, or the published patches | [README, "The bug you need to know about"](https://github.com/ProprietaryLegal/deepseek-v4-flash-v100#the-bug-you-need-to-know-about--updated-it-affects-every-backend-not-just-volta); upstream issue [llama.cpp #25382](https://github.com/ggml-org/llama.cpp/issues/25382) |
+| More than eight cards does not help with a layer split | ten cards about equal to eight (11.5 against 12.2 tok/s); fourteen cards **halve** throughput (7.8 tok/s) once the split spans four NVLink islands joined by PCIe | [README, "Quickstart"](https://github.com/ProprietaryLegal/deepseek-v4-flash-v100#quickstart) |
+
+What it taught the later builds: a model can look healthy while being wrong, so every later change carries an
+output check; and adding boards without a layout that respects PCIe makes things slower.
+
+## DeepSeek-V4.1-Flash, the first twelve-card port (October 2026)
+
+Pull request: [1Cat-vLLM #1031](https://github.com/1CatAI/1Cat-vLLM/pull/1031) · record:
+<https://huggingface.co/ProprietaryLegal/deepseek-v4.1-flash-sm70>
+
+| Finding | Number | Source |
+|---|---|---|
+| The official checkpoint (FP8 dense layers, MXFP4 experts, Engram) runs on twelve V100s in three stages of four, or on eight with 120 experts per layer in pinned host RAM | UPSTREAM (the pull request): 2.8 to 3.9 tok/s. No CUDA graphs: limited by the CPU and by kernel launches | [#1031](https://github.com/1CatAI/1Cat-vLLM/pull/1031) |
+| Only some stage cuts are legal: layer 20 for two stages; layers 14 and 28 for three | - | [#1031](https://github.com/1CatAI/1Cat-vLLM/pull/1031) |
+| Block-FP8 dense weights can stay FP8 on Volta | UPSTREAM: dense bytes 63.5 to 33.7 MiB per layer set; 115.2 to 74.2 microseconds at one row (-36 %); a loss above 16 rows (+13 % at 32, +23 % at 64) | [#1021](https://github.com/1CatAI/1Cat-vLLM/pull/1021), merged 2026-11-16 |
+| The MXFP4 expert kernel generalised to this model's geometry (384 experts, 6 active; split sizes 4, 6, 9, 12, 18) | - | [#1030](https://github.com/1CatAI/1Cat-vLLM/pull/1030), open |
+
+What it taught: the layout was right and the engine was not yet fast. What turned about 3 tok/s into about 100
+within a month was other people's engine work on the same fork: CUDA graphs and the speculative drafter for this
+model ([#1243](https://github.com/1CatAI/1Cat-vLLM/pull/1243), rivetphilbot) and the complete four-card package
+with packed key-value storage ([#1277](https://github.com/1CatAI/1Cat-vLLM/pull/1277), yangzhuxinyzx).
+
+## DeepSeek-V4.1-Flash on the EXL3 engine (2026-11-01)
+
+Repository: [Volta sPLIt, `previous-build/`](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/tree/main/previous-build)
+and the interim report in [deepseek-v4-flash-v100](https://github.com/ProprietaryLegal/deepseek-v4-flash-v100#deepseek-v41-flash-1017-on-8-v100-with-1cat-vllm-results-so-far-2026-11-01).
+The engine and the EXL3 pack are Phil Tompkins' ([philbert440/deepseek-v4.1-v100](https://github.com/philbert440/deepseek-v4.1-v100)).
+
+| Finding | Number (MEASURED, eight V100-SXM2-32GB, 180 W, 1,425 MHz ceiling, its own method) | Source |
+|---|---|---|
+| Decode | 42 to 46 tok/s, 31.4 with thinking on; 71.2 to 71.6 ms per verify round | [Volta sPLIt README, the progression](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4#the-progression-in-toks) |
+| Engram tables resident in RAM instead of read from disk | cold first token on a 75K-token prompt 46.00 to 26.94 s (-41.4 %); warm first token unchanged; three concurrent 300K prompts 476 to 368 s; 16 of 16 greedy outputs byte-identical | [interim report](https://github.com/ProprietaryLegal/deepseek-v4-flash-v100#deepseek-v41-flash-1017-on-8-v100-with-1cat-vllm-results-so-far-2026-11-01) |
+| A shared-memory-staged prefill kernel for the EXL3 experts | -7.5 to -13.2 % per tiled pass on one card, bit-identical. Kernel level only; no server measurement | same |
+| Hardware faults found on the way | PCIe completion-timeout resets at a higher power limit with uncapped clocks; ECC errors that stopped when memory speed was lowered | same |
+| Where it stayed ahead of Volta sPLIt | faster reading of short and medium prompts (about 2,900 to 3,300 tok/s by its own method) and three requests at once | [Volta sPLIt README](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4#what-this-is) |
+
+What it taught: per verify round the next engine was about three times faster (71 ms against 23 ms, ESTIMATE by
+arithmetic on the two builds' measured rounds). The round, not tokens per second, became the unit.
+
+## The 1Cat package on one four-card board (2026-11-02)
+
+Record: [Volta sPLIt, docs/four-card.md](https://github.com/ProprietaryLegal/Volta-sPLIt-DeepSeek-V4.1-Flash-1017-8xV100-SXM2-PP2xTP4/blob/main/docs/four-card.md).
+The package is [1Cat-vLLM #1277](https://github.com/1CatAI/1Cat-vLLM/pull/1277) by yangzhuxinyzx.
+
+| Finding | Number (MEASURED on one board, #1277 with no changes) | Source |
+|---|---|---|
+| Warm decode | 27.8 ms per round; warm real text 30.8 ms per round, 97.1 tok/s | docs/four-card.md |
+| Fresh text | 116.7 ms per round, 25.0 tok/s | same |
+| Why fresh text is slow | Four cards cannot hold every expert (the routed experts alone are 132 GB), so a third of them are fetched from host memory over a shared PCIe uplink | same |
+| Our four-card series of the later patches | **failed to boot** in its four-card smoke test (2026-11-04). Not current | same |
+
+What it taught: the engine was already fast when the experts were on the cards. The whole Volta sPLIt port follows
+from that one observation: put the second half of the model on a second board so that no expert is ever fetched.
+
+## Swift 1.5 on four V100s (October 2026)
+
+Repository: <https://github.com/ProprietaryLegal/swift-1.5-v100>
+
+A 27B model, not DeepSeek. It runs on the stock 1Cat-vLLM 1.5.1 wheel with no engine change: NVFP4 MLP weights and
+FP8 attention weights load through 1Cat's Volta paths. MEASURED: 247.7 tok/s decode at a 12K-token prompt on four
+cards, the same as the base model's NVFP4 build
+([README](https://github.com/ProprietaryLegal/swift-1.5-v100#what-we-got)). It is here as the reference point for
+what one board does with a model that fits it: tensor parallel 4 inside one board, no pipeline, no offload.
+
+## The V100 research notes of June and July 2026
+
+Folder: <https://github.com/ProprietaryLegal/pli-labs/tree/main/research/v100>. The July 2026 serving sprint
+measured, on the same class of hardware: prefix-cache reuse cutting time to first token 36.7 to 86.6 times; CUDA
+graphs giving 2.56 to 4.5 times decode on sm_70; a 122B mixture-of-experts model going from 39.7 tok/s on stock
+Ollama to 61.8 on llama.cpp and 67.6 on vLLM
+([case study](https://github.com/ProprietaryLegal/pli-labs/blob/main/research/v100/serving-optimization-2026-07/README.md)).
+The fuller research archive behind those notes is in this repository's [research/](../research/README.md) folder.
