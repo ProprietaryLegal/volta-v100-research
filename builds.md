@@ -12,22 +12,23 @@ request hold a long context.
 
 ## Volta 12X AmPLIfy
 
-[![Volta 12X AmPLIfy: 12x V100-SXM2-32GB; decode 130 tok/s for one request on fresh text, 179 when copying text; prefill 3,833 tok/s on a 93K-token prompt, 3,316 at 248K, 2,454 at 426K; four requests together 312 tok/s in sum; KV cache: 524K tokens of context per request, four slots](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-12x-amplify.svg)](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4)
+[![Volta 12X AmPLIfy: 12x V100-SXM2-32GB; decode 161 tok/s for one code request at 128K tokens of context, 87 on legal or prose; prefill 4,444 tok/s on a 128K code prompt, 4,152 at 256K; three code requests together 364 tok/s summed; KV cache: 524K tokens of context per request, four slots](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-12x-amplify.svg)](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4)
 
 Repository: <https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4> ·
 [its optimizations](optimizations/volta-12x-amplify.md)
 
-Every routed expert at NVIDIA's NVFP4 precision, all 15,360 in card memory. MEASURED 2026-11-17 and early
-2026-11-18, clock ceiling 1,477 MHz.
+Every routed expert at NVIDIA's NVFP4 precision, all 15,360 in card memory. MEASURED 2026-11-18, the closing bench of
+the first optimization campaign on the serving set of that day (kit 9N with nine engine switches, see
+[its optimizations](optimizations/volta-12x-amplify.md)): 175 W per card, clock ceiling 1,452 MHz, four slots, cold
+reads, thinking off, 1,024 tokens out, mean of two runs; code, legal and prose prompts of 1K to 256K tokens.
 
 | What | Figures |
 |---|---|
 | **Hardware** | 12x V100-SXM2-32GB on three NVLink boards; three pipeline stages of four tensor-parallel cards (layers 0-13, 14-27, 28-39) |
-| **Speed** | Decode, one request: 128.1 tok/s on fresh text, 176.6 on a copying task (150 W); 129.7 and 179.2 at 200 W (one run). Prefill at 200 W (one run each): 3,850 tok/s at 61K tokens, 3,833 at 93K, 3,316 at 248K, 2,454 at 426K |
-| **Context and KV cache** | 524,288 tokens per request. On a chat of about 128,600 tokens, a turn that adds 880 tokens reaches its first token in 1.24 s; adding 4,200 tokens, 3.75 s. Decode round 28.1 ms at 128K of context (26.25 ms on a short chat) |
-| **Concurrency** | Four slots (four chats kept warm). Four requests together: 306.6 tok/s on fresh text, summed over the requests (242.6 by wall clock), 453.4 on copying tasks. A pipeline step carries one request, so throughput rises only up to three at once |
+| **Speed, one request** | Decode at 128K tokens of context: code 161 tok/s, legal 87, prose 87 (at 1K: 178 / 99 / 84; at 256K: 168 / 94 / 79). Prefill, prompt tokens over the time to the first token: code 4,414 tok/s at 64K, 4,444 at 128K, 4,152 at 256K; legal 3,746 / 3,794 / 4,076; prose 3,670 / 4,033 / 4,159. First token on a 128K prompt: 29.5 s code, 35.4 s legal, 32.8 s prose; on a 256K prompt 63 to 64 s |
+| **Several requests together** | Three streams released together on 128K prompts, each stream's own decode rate while all three stream, summed: code 364 tok/s, legal 205, prose 200 (at 1K: 432 / 248 / 213). Counted over the joint window, from the first request's start to the last one's end: 139 / 109 / 108 tok/s at 128K and 415 / 242 / 209 at 1K. Long prompts are read one after another, so the later streams wait for the earlier reads; a pipeline step carries one request. With the document already in the prefix cache (MEASURED 2026-11-18, same conditions): a request's first token comes in 0.4 to 0.5 s at 128K and 0.7 s at 256K at any kind, and three code streams on one cached 128K document decode 390 tok/s over the joint window (legal 254, prose 228), the summed and joint figures within 2 %. The first time a second or a third stream shares a document the server reads it once more; after that every stream hits |
+| **Context and KV cache** | 524,288 tokens per request, four slots (four chats kept warm). On a chat of about 128,600 tokens with every prefix a hit, a turn that adds 880 tokens reaches its first token in 1.13 s; adding 4,200 tokens, 2.32 s (window p5, 175 W). Decode round 24.2 ms on a short chat, 27.0 ms at 128K of context (window p3, 175 W) |
 | **Accuracy** | The experts are NVIDIA's NVFP4 pack, value-equal to DeepSeek's official experts (UPSTREAM). Against an all-native reference: first divergence after a median of 208 tokens; mean absolute log-probability difference 0.0090. Answer quality in use: not established |
-
 ## Volta Max uPLIft
 
 [![Volta Max uPLIft: 8x V100-SXM2-32GB; at 128K context: decode 148 tok/s on code, 146 on JSON, 79 on legal text, 77 on prose; prefill 2,727 to 3,145 tok/s, first token after 43.8 s; three requests together 176 tok/s, same tokens as each alone; KV cache: 524K tokens of context per request, two slots, a follow-up resumes in 0.69 s](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-max-uplift.svg)](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4)
