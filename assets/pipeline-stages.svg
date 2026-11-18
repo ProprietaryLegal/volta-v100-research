@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 466" width="800" height="466" role="img" aria-labelledby="t d">
+<title id="t">Pipeline stages of tensor-parallel cards</title>
+<desc id="d">The model's 40 layers are cut into pipeline stages. Each stage runs on one four-card NVLink board in tensor parallel 4. Eight cards: layers 0 to 19 and 20 to 39. Twelve cards: layers 0 to 13, 14 to 27 and 28 to 39. Only the hand-off between stages crosses PCIe.</desc>
+<rect width="800" height="466" fill="#ffffff"/>
+<text x="20" y="30" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="bold" fill="#1b1f24" text-anchor="start">How the model is cut: pipeline stages of tensor-parallel cards</text>
+<text x="20" y="60" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">Eight cards, two stages (Volta sPLIt, Volta Max uPLIft, Volta Full NVFP4)</text>
+<rect x="20" y="72" width="200" height="150" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
+<text x="32" y="94" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">Stage 0: board 1</text>
+<text x="32" y="112" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">layers 0 to 19</text>
+<rect x="34" y="124" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="53" y="144" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="53" y="159" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="80" y="124" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="99" y="144" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="99" y="159" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="126" y="124" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="145" y="144" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="145" y="159" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="172" y="124" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="191" y="144" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="191" y="159" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<line x1="72" y1="147" x2="80" y2="147" stroke="#0969da" stroke-width="2"/>
+<line x1="118" y1="147" x2="126" y2="147" stroke="#0969da" stroke-width="2"/>
+<line x1="164" y1="147" x2="172" y2="147" stroke="#0969da" stroke-width="2"/>
+<text x="32" y="190" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#0969da" text-anchor="start">NVLink inside the board</text>
+<text x="32" y="208" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">+ Engram lookup</text>
+<rect x="300" y="72" width="200" height="150" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
+<text x="312" y="94" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">Stage 1: board 2</text>
+<text x="312" y="112" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">layers 20 to 39</text>
+<rect x="314" y="124" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="333" y="144" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="333" y="159" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="360" y="124" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="379" y="144" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="379" y="159" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="406" y="124" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="425" y="144" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="425" y="159" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="452" y="124" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="471" y="144" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="471" y="159" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<line x1="352" y1="147" x2="360" y2="147" stroke="#0969da" stroke-width="2"/>
+<line x1="398" y1="147" x2="406" y2="147" stroke="#0969da" stroke-width="2"/>
+<line x1="444" y1="147" x2="452" y2="147" stroke="#0969da" stroke-width="2"/>
+<text x="312" y="190" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#0969da" text-anchor="start">NVLink inside the board</text>
+<text x="312" y="208" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">+ head, drafter</text>
+<line x1="220" y1="147" x2="300" y2="147" stroke="#cf222e" stroke-width="2.5" stroke-dasharray="6 4"/>
+<text x="260" y="138" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#cf222e" text-anchor="middle">PCIe</text>
+<text x="260" y="165" font-family="Helvetica, Arial, sans-serif" font-size="10.5" font-weight="normal" fill="#cf222e" text-anchor="middle">one hand-off</text>
+<text x="260" y="178" font-family="Helvetica, Arial, sans-serif" font-size="10.5" font-weight="normal" fill="#cf222e" text-anchor="middle">per step</text>
+<text x="530" y="100" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">Tensor parallel (TP4): each card holds a</text>
+<text x="530" y="117" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">quarter of every matrix; the four add their</text>
+<text x="530" y="134" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">partial results after every layer. That sum</text>
+<text x="530" y="151" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">needs NVLink: 5.28 microseconds inside a</text>
+<text x="530" y="168" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">board, 30.8 across two.</text>
+<text x="530" y="196" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">Pipeline parallel (PP): the layers are cut</text>
+<text x="530" y="213" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">into runs. Only the hand-off between runs</text>
+<text x="530" y="230" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">crosses PCIe.</text>
+<text x="20" y="262" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">Twelve cards, three stages (Volta 12X AmPLIfy)</text>
+<rect x="20" y="274" width="200" height="150" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
+<text x="32" y="296" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">Stage 0: board 1</text>
+<text x="32" y="314" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">layers 0 to 13</text>
+<rect x="34" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="53" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="53" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="80" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="99" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="99" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="126" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="145" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="145" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="172" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="191" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="191" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<line x1="72" y1="349" x2="80" y2="349" stroke="#0969da" stroke-width="2"/>
+<line x1="118" y1="349" x2="126" y2="349" stroke="#0969da" stroke-width="2"/>
+<line x1="164" y1="349" x2="172" y2="349" stroke="#0969da" stroke-width="2"/>
+<text x="32" y="392" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#0969da" text-anchor="start">NVLink inside the board</text>
+<text x="32" y="410" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">5,376 experts</text>
+<rect x="300" y="274" width="200" height="150" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
+<text x="312" y="296" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">Stage 1: board 2</text>
+<text x="312" y="314" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">layers 14 to 27</text>
+<rect x="314" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="333" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="333" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="360" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="379" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="379" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="406" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="425" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="425" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="452" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="471" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="471" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<line x1="352" y1="349" x2="360" y2="349" stroke="#0969da" stroke-width="2"/>
+<line x1="398" y1="349" x2="406" y2="349" stroke="#0969da" stroke-width="2"/>
+<line x1="444" y1="349" x2="452" y2="349" stroke="#0969da" stroke-width="2"/>
+<text x="312" y="392" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#0969da" text-anchor="start">NVLink inside the board</text>
+<text x="312" y="410" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">5,376 experts</text>
+<rect x="580" y="274" width="200" height="150" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
+<text x="592" y="296" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">Stage 2: board 3</text>
+<text x="592" y="314" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">layers 28 to 39</text>
+<rect x="594" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="613" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="613" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="640" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="659" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="659" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="686" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="705" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="705" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<rect x="732" y="326" width="38" height="46" rx="4" fill="#ffffff" stroke="#0969da" stroke-width="1.2"/>
+<text x="751" y="346" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#1b1f24" text-anchor="middle">V100</text>
+<text x="751" y="361" font-family="Helvetica, Arial, sans-serif" font-size="10" font-weight="normal" fill="#57606a" text-anchor="middle">1/4</text>
+<line x1="632" y1="349" x2="640" y2="349" stroke="#0969da" stroke-width="2"/>
+<line x1="678" y1="349" x2="686" y2="349" stroke="#0969da" stroke-width="2"/>
+<line x1="724" y1="349" x2="732" y2="349" stroke="#0969da" stroke-width="2"/>
+<text x="592" y="392" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#0969da" text-anchor="start">NVLink inside the board</text>
+<text x="592" y="410" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">4,608 experts, head, drafter</text>
+<line x1="220" y1="349" x2="300" y2="349" stroke="#cf222e" stroke-width="2.5" stroke-dasharray="6 4"/>
+<text x="260" y="340" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#cf222e" text-anchor="middle">PCIe</text>
+<line x1="500" y1="349" x2="580" y2="349" stroke="#cf222e" stroke-width="2.5" stroke-dasharray="6 4"/>
+<text x="540" y="340" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="bold" fill="#cf222e" text-anchor="middle">PCIe</text>
+<text x="20" y="450" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#57606a" text-anchor="start">A step of the pipeline carries one request. Three stages keep three steps in flight; they do not make one request faster.</text>
+</svg>

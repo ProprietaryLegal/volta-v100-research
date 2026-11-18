@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 770 362" width="770" height="362" role="img" aria-labelledby="t d">
+<title id="t">One Tesla V100 card and what it lacks</title>
+<desc id="d">A V100 has 80 SMs with FP16-only tensor cores, a 6 MB L2 cache and 32 GB of HBM2 at 900 GB/s. NVLink joins it to the three other cards of its board; PCIe Gen3 x8 joins it to the host and to other boards. It lacks FP8, FP4, BF16 and INT8 tensor modes, cp.async, ldmatrix, TMA and wgmma.</desc>
+<rect width="770" height="362" fill="#ffffff"/>
+<text x="20" y="30" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="bold" fill="#1b1f24" text-anchor="start">One Tesla V100-SXM2-32GB (Volta, sm_70, 2017)</text>
+<rect x="20" y="48" width="470" height="300" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
+<text x="36" y="72" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">80 streaming multiprocessors (SMs)</text>
+<rect x="36" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="58" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="80" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="102" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="124" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="146" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="168" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="190" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="212" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="234" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="256" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="278" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="300" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="322" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="344" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="366" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="388" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="410" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="432" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="454" y="82" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="36" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="58" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="80" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="102" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="124" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="146" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="168" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="190" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="212" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="234" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="256" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="278" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="300" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="322" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="344" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="366" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="388" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="410" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="432" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="454" y="100" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="36" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="58" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="80" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="102" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="124" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="146" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="168" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="190" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="212" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="234" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="256" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="278" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="300" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="322" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="344" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="366" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="388" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="410" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="432" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="454" y="118" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="36" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="58" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="80" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="102" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="124" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="146" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="168" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="190" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="212" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="234" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="256" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="278" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="300" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="322" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="344" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="366" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="388" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="410" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="432" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<rect x="454" y="136" width="18" height="13" rx="2" fill="#d0e8ff" stroke="#0969da" stroke-width="0.8"/>
+<text x="36" y="172" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">Tensor cores: FP16 only, mma.sync.m8n8k4 (about 125 TFLOPS at 1,530 MHz)</text>
+<rect x="36" y="186" width="438" height="34" rx="6" fill="#fff8c5" stroke="#9a6700" stroke-width="1.2"/>
+<text x="48" y="208" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">L2 cache: 6 MB. A layer's weights do not fit; they stream from HBM2 every step</text>
+<rect x="36" y="230" width="438" height="52" rx="6" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.2"/>
+<text x="48" y="252" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">HBM2: 32 GB at 900 GB/s on the data sheet</text>
+<text x="48" y="271" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">measured ceiling 879 GB/s read (v100-skinny)</text>
+<text x="36" y="306" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">Decode needs about 139 operations per byte to keep the tensor cores busy.</text>
+<text x="36" y="324" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">It does 1 to 47. The card waits on memory and on kernel launches, not on math.</text>
+<rect x="520" y="48" width="230" height="84" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"/>
+<text x="532" y="70" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">NVLink 2.0</text>
+<text x="532" y="89" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">to the 3 other cards of its board</text>
+<text x="532" y="107" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">a four-card sum: 5.28 microseconds</text>
+<text x="532" y="124" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">(measured)</text>
+<rect x="520" y="146" width="230" height="96" rx="6" fill="#ffebe9" stroke="#cf222e" stroke-width="1.2"/>
+<text x="532" y="168" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">PCIe Gen3 x8</text>
+<text x="532" y="187" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">to the host and to other boards</text>
+<text x="532" y="205" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">host memory read by a card:</text>
+<text x="532" y="222" font-family="Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#1b1f24" text-anchor="start">3.5 to 4.9 GB/s (measured)</text>
+<text x="532" y="238" font-family="Helvetica, Arial, sans-serif" font-size="11" font-weight="normal" fill="#57606a" text-anchor="start">an eight-card sum: 30.8 microseconds</text>
+<line x1="490" y1="90" x2="520" y2="90" stroke="#0969da" stroke-width="2"/>
+<line x1="490" y1="194" x2="520" y2="194" stroke="#cf222e" stroke-width="2"/>
+<rect x="520" y="256" width="230" height="92" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
+<text x="532" y="277" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">What sm_70 lacks</text>
+<text x="532" y="296" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">FP8, FP4, BF16, INT8 tensor modes</text>
+<text x="532" y="313" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">cp.async (Ampere), ldmatrix (Turing)</text>
+<text x="532" y="330" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">TMA, wgmma, clusters (Hopper)</text>
+</svg>

@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 366" width="800" height="366" role="img" aria-labelledby="t d">
+<title id="t">Where the time of a decode round and of a prompt chunk goes</title>
+<desc id="d">Twelve-card build, measured once at 200 W. A decode round of 26.25 ms: experts 29 percent, dense multiplies 21, drafter 10, attention 9, norms 7, router 5, index 3, four-card sums 2, head and sampling 2, outside any kernel 14. A 4,092-row prompt chunk on the first stage, 793 ms: experts, router and sums 318 ms, attention 119, output projection 104, norms 92, query and key projections 65, index 53, compressor and Engram 28, other 14.</desc>
+<rect width="800" height="366" fill="#ffffff"/>
+<text x="20" y="30" font-family="Helvetica, Arial, sans-serif" font-size="17" font-weight="bold" fill="#1b1f24" text-anchor="start">Where the time goes (twelve-card build, measured once at 200 W)</text>
+<text x="20" y="62" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">One decode round, one request, short chat: 26.25 ms</text>
+<rect x="20" y="72" width="217.9" height="34" rx="0" fill="#0969da" stroke="#ffffff" stroke-width="1"/>
+<rect x="237.9" y="72" width="152.5" height="34" rx="0" fill="#54aeff" stroke="#ffffff" stroke-width="1"/>
+<rect x="390.4" y="72" width="77.5" height="34" rx="0" fill="#8250df" stroke="#ffffff" stroke-width="1"/>
+<rect x="467.9" y="72" width="63.4" height="34" rx="0" fill="#1a7f37" stroke="#ffffff" stroke-width="1"/>
+<rect x="531.3" y="72" width="48.4" height="34" rx="0" fill="#4ac26b" stroke="#ffffff" stroke-width="1"/>
+<rect x="579.7" y="72" width="35.4" height="34" rx="0" fill="#bf8700" stroke="#ffffff" stroke-width="1"/>
+<rect x="615.0" y="72" width="21.8" height="34" rx="0" fill="#d4a72c" stroke="#ffffff" stroke-width="1"/>
+<rect x="636.8" y="72" width="18.1" height="34" rx="0" fill="#bc4c00" stroke="#ffffff" stroke-width="1"/>
+<rect x="654.9" y="72" width="18.1" height="34" rx="0" fill="#fa4549" stroke="#ffffff" stroke-width="1"/>
+<rect x="673.0" y="72" width="107.0" height="34" rx="0" fill="#8c959f" stroke="#ffffff" stroke-width="1"/>
+<rect x="20" y="118" width="11" height="11" rx="2" fill="#0969da" stroke="#ffffff" stroke-width="0.5"/>
+<text x="36" y="128" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Experts 7.70 ms (29 %)</text>
+<rect x="212" y="118" width="11" height="11" rx="2" fill="#54aeff" stroke="#ffffff" stroke-width="0.5"/>
+<text x="228" y="128" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Dense multiplies 5.39 ms (21 %)</text>
+<rect x="404" y="118" width="11" height="11" rx="2" fill="#8250df" stroke="#ffffff" stroke-width="0.5"/>
+<text x="420" y="128" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Drafter 2.74 ms (10 %)</text>
+<rect x="596" y="118" width="11" height="11" rx="2" fill="#1a7f37" stroke="#ffffff" stroke-width="0.5"/>
+<text x="612" y="128" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Attention 2.24 ms (9 %)</text>
+<rect x="20" y="138" width="11" height="11" rx="2" fill="#4ac26b" stroke="#ffffff" stroke-width="0.5"/>
+<text x="36" y="148" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Norms and mixing 1.71 ms (7 %)</text>
+<rect x="212" y="138" width="11" height="11" rx="2" fill="#bf8700" stroke="#ffffff" stroke-width="0.5"/>
+<text x="228" y="148" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Router 1.25 ms (5 %)</text>
+<rect x="404" y="138" width="11" height="11" rx="2" fill="#d4a72c" stroke="#ffffff" stroke-width="0.5"/>
+<text x="420" y="148" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Index 0.77 ms (3 %)</text>
+<rect x="596" y="138" width="11" height="11" rx="2" fill="#bc4c00" stroke="#ffffff" stroke-width="0.5"/>
+<text x="612" y="148" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Four-card sums 0.64 ms (2 %)</text>
+<rect x="20" y="158" width="11" height="11" rx="2" fill="#fa4549" stroke="#ffffff" stroke-width="0.5"/>
+<text x="36" y="168" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Head, sampling 0.64 ms (2 %)</text>
+<rect x="212" y="158" width="11" height="11" rx="2" fill="#8c959f" stroke="#ffffff" stroke-width="0.5"/>
+<text x="228" y="168" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Outside any kernel 3.78 ms (14 %)</text>
+<text x="20" y="196" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="start">Half the round is experts and dense multiplies at one row: per-layer overhead, not arithmetic. 14 % is outside any kernel.</text>
+<text x="20" y="236" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#1b1f24" text-anchor="start">Reading one 4,092-row prompt chunk, first stage: 793 ms</text>
+<rect x="20" y="246" width="304.8" height="34" rx="0" fill="#0969da" stroke="#ffffff" stroke-width="1"/>
+<rect x="324.8" y="246" width="114.0" height="34" rx="0" fill="#1a7f37" stroke="#ffffff" stroke-width="1"/>
+<rect x="438.8" y="246" width="99.7" height="34" rx="0" fill="#54aeff" stroke="#ffffff" stroke-width="1"/>
+<rect x="538.5" y="246" width="88.2" height="34" rx="0" fill="#4ac26b" stroke="#ffffff" stroke-width="1"/>
+<rect x="626.7" y="246" width="62.3" height="34" rx="0" fill="#8250df" stroke="#ffffff" stroke-width="1"/>
+<rect x="689.0" y="246" width="50.8" height="34" rx="0" fill="#d4a72c" stroke="#ffffff" stroke-width="1"/>
+<rect x="739.7" y="246" width="26.8" height="34" rx="0" fill="#bc4c00" stroke="#ffffff" stroke-width="1"/>
+<rect x="766.6" y="246" width="13.4" height="34" rx="0" fill="#8c959f" stroke="#ffffff" stroke-width="1"/>
+<rect x="20" y="292" width="11" height="11" rx="2" fill="#0969da" stroke="#ffffff" stroke-width="0.5"/>
+<text x="36" y="302" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Experts, router, sums 318 ms (40 %)</text>
+<rect x="212" y="292" width="11" height="11" rx="2" fill="#1a7f37" stroke="#ffffff" stroke-width="0.5"/>
+<text x="228" y="302" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Attention 119 ms (15 %)</text>
+<rect x="404" y="292" width="11" height="11" rx="2" fill="#54aeff" stroke="#ffffff" stroke-width="0.5"/>
+<text x="420" y="302" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Output projection 104 ms (13 %)</text>
+<rect x="596" y="292" width="11" height="11" rx="2" fill="#4ac26b" stroke="#ffffff" stroke-width="0.5"/>
+<text x="612" y="302" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Norms and mixing 92 ms (12 %)</text>
+<rect x="20" y="312" width="11" height="11" rx="2" fill="#8250df" stroke="#ffffff" stroke-width="0.5"/>
+<text x="36" y="322" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Query, key projections 65 ms (8 %)</text>
+<rect x="212" y="312" width="11" height="11" rx="2" fill="#d4a72c" stroke="#ffffff" stroke-width="0.5"/>
+<text x="228" y="322" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Index 53 ms (7 %)</text>
+<rect x="404" y="312" width="11" height="11" rx="2" fill="#bc4c00" stroke="#ffffff" stroke-width="0.5"/>
+<text x="420" y="322" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Compressor, Engram 28 ms (4 %)</text>
+<rect x="596" y="312" width="11" height="11" rx="2" fill="#8c959f" stroke="#ffffff" stroke-width="0.5"/>
+<text x="612" y="322" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#1b1f24" text-anchor="start">Other 14 ms (2 %)</text>
+<text x="20" y="350" font-family="Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#57606a" text-anchor="start">The index grows with context: 53 ms on the first stage, 142 on the second, 222 on the third; in decode, 0.77 ms at a short chat, 4.47 ms at 249K.</text>
+</svg>

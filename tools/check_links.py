@@ -23,6 +23,7 @@ HTML_REF = re.compile(r"""(?:href|src)=["']([^"']+)["']""")
 HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 ANCHOR = re.compile(r"""<a\s+(?:id|name)=["']([^"']+)["']""")
 FENCE = re.compile(r"^\s*(```|~~~)")
+SPACED = re.compile(r"\]\(((?!https?://)[^)\s\"]+(?:\s+[^)\s\"]+)+)\)")
 
 
 def slug(text):
@@ -84,6 +85,9 @@ def main():
         for num, raw in enumerate(read_lines(path), 1):
             line = strip_code_spans(raw)
             targets = LINK.findall(line) + IMAGE.findall(line) + AUTOLINK.findall(line) + HTML_REF.findall(line)
+            for bad in SPACED.findall(line):
+                internal += 1
+                broken.append(f"{rel}:{num}: link target contains spaces: {bad}")
             for t in targets:
                 if t.startswith(("http://", "https://")):
                     ext.setdefault(t, f"{rel}:{num}")

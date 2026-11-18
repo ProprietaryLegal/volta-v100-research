@@ -41,6 +41,24 @@ Every number is labelled **MEASURED** (on our hardware, with its date, power lim
 result. A configuration that did not pass its own rule says "quality not established". The failures are told as
 plainly as the wins.
 
+## Checking this repository
+
+```sh
+python3 tools/check_links.py             # every internal link and heading anchor
+python3 tools/check_links.py --external  # also request every external link once
+```
+
+The site is plain GitHub Pages with a stock theme (`_config.yml`, one small stylesheet in `assets/css/`). To build it
+locally with the same toolchain GitHub uses:
+
+```sh
+mkdir -p _site
+docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+  -v "$PWD:/src:ro" -v "$PWD/_site:/out" -e PAGES_REPO_NWO=OWNER/REPO \
+  --entrypoint /bin/sh ghcr.io/actions/jekyll-build-pages:v1.0.13 \
+  -c 'cd /tmp && github-pages build -s /src -d /out'
+```
+
 ## The builder skill
 
 The method behind these builds is packaged as a skill for coding agents, **PLI Volta Builder**:

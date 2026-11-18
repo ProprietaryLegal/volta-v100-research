@@ -1,0 +1,36 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+/* Wider page and readable wide tables. Nothing else is changed from the stock theme. */
+.main-content {
+  max-width: 76rem;
+}
+.main-content table {
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+.main-content table th,
+.main-content table td {
+  vertical-align: top;
+  min-width: 7.5rem;
+  padding: 0.45rem 0.7rem;
+}
+.main-content table td code,
+.main-content table th code {
+  white-space: normal;
+  word-break: break-word;
+}
+.main-content img {
+  max-width: 100%;
+  height: auto;
+}
+.page-header .project-name {
+  font-size: 2.2rem;
+}
+@media screen and (min-width: 64em) {
+  .page-header .project-name {
+    font-size: 2.6rem;
+  }
+}
