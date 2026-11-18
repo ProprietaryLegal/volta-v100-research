@@ -56,6 +56,10 @@ our work.
 | **Elevatormusic** and the TensorFold authors | [TensorFold #25](https://github.com/Elevatormusic/TensorFold/pull/25): coupled sampled drafts | +14 % tok/s at temperature 1 on Volta sPLIt |
 | **0rand** | [deepseek-v41-tensorfold-spark](https://github.com/0rand/deepseek-v41-tensorfold-spark): the same idea in a DGX Spark recipe, and expert top-p pruning | the pruning was tested here and lost |
 | **sudoingX** | The `p4_kld.py` fidelity method and its general panel; the [two-Spark launcher](https://github.com/sudoingX/dgx-spark-deepseek-v41) | Volta sPLIt's fidelity figures |
+| **Baseten** | [deepseek-ultrafast](https://github.com/basetenlabs/deepseek-ultrafast) | read and ported privately; the twelve-card build's conversation store comes out of that work |
+| **Leonccaa** | [ReVolta](https://github.com/Leonccaa/ReVolta), a V100 inference server | reviewed for ideas |
+| **mw00**, **lxe** | [project-maya](https://github.com/mw00/project-maya), [dsx](https://github.com/lxe/dsx) | read as research leads |
+| **0xSero** | the hill-climbing scripts at <https://github.com/0xsero> | the builder skill's optimization loop is borrowed from them |
 | **OpenMMLab** | TurboMind's sm_70 GEMM code, carried by 1Cat-vLLM | the operand decoders our prefill expert kernel keeps |
 | **NVIDIA** | The Volta, Ampere, Hopper and Blackwell tuning guides; compute-sanitizer | the kernel rules |
 

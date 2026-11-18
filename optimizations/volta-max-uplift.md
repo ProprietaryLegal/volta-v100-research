@@ -38,9 +38,32 @@ how much of the routed work can run at the official precision with every expert 
 | Dropping the host tier | An earlier step kept part of the experts in host RAM (three tiers). General text was slow there because of host-RAM reads | general text 33.4 ms per round without a host tier against 58.0 to 59.4 ms with it (2026-11-09; speed only, that profile was not accepted) | - | [README, "What worked"](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4#what-worked) |
 | Per-stage card reserve | One reserve for both stages ran out of memory on a 100K prompt. Reserves are now set per stage from memory peaks sampled during long reads | a 498,099-token prompt reads without an out-of-memory error | - | same |
 
-How close the result is to NVIDIA's NVFP4 pack, measured under rules fixed before any capture, is in
-[builds.md](../builds.md#volta-max-uplift): the same next token on 95.1 % of compared tokens for the build of the
-first release.
+### How the experts were chosen, and how the choice was judged
+
+1. **Count routes.** The model's router picks 6 of 384 experts per layer for every token. Counters in the engine
+   record which experts a stream of text actually uses. The counts were taken on four kinds of text: three public
+   prompt sets, and the owner's own private workload (in his words, in
+   [a public post](https://www.reddit.com/r/homelab/comments/1xusbar/lawyers_v100_homelab_update_2_the_8x_v100_box_now/):
+   "'Used the most' was counted on a mix of four kinds of text. One is my own legal harness traffic, which is
+   private and not published. The other three are public prompt sets in the repo."). The counts themselves are not
+   published; to reproduce the build you count routes on your own text.
+2. **Promote by use per byte.** Every expert's compressed record goes on the cards first. Experts are then swapped
+   up to their NVFP4 records in order of use per byte until the next one does not fit. Packing the cheapest
+   promotions first would have fitted more experts (6,377 to 6,379 against 6,087) but less-used ones, so it could
+   not carry more of the work at NVFP4.
+3. **Judge by closeness, properly.** The claim "closer to the NVFP4 pack" was tested, not assumed. The test was
+   preregistered: items, scoring code and verdict rules fixed and hashed before any output was captured
+   ([preregistration](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4/blob/main/quality/closeness-test/PREREGISTRATION.txt)).
+   320 contexts and 513 MMLU questions, greedy, thinking off; the reference served on the same cards and run twice,
+   so its own repeat is the noise floor (100 % identical). Results for the build of the first release, MEASURED
+   2026-11-11: the same next token as NVIDIA's NVFP4 pack on **95.1 %** of compared tokens (95 % interval 94.4 to
+   95.7); mean KL divergence from it 0.079 nats (a lower bound, over the top 20 tokens); the first token of every
+   answer identical (native prompt reading); 1.6 % of multiple-choice answers different from the reference's;
+   accuracy 83.6 %, not distinguishable from the reference's at this sample size.
+4. **Say what the test does not show.** It measures closeness to NVIDIA's pack, which is itself a quantization of
+   the original model. It is greedy, without thinking, at most 32 tokens per item. And it ran on the first release:
+   the later default (two slots, fast prompt reading) has not been through it, which is why that default says
+   "quality not established" everywhere.
 
 ## Adopted: speed
 
@@ -74,7 +97,7 @@ A token-exact test of cache reuse must compare a hit with a hit at the same posi
 | An expert kernel with 64 rows per weight load (RB 8) | the same bits, but slower: 204 registers per thread and 41,728 bytes of shared memory per block; up to 1.39 times the old kernel's time per cycle | Not shipped |
 | A tensor-core prompt-reading kernel whose output is not bit-equal | on one card 21.8 % slower than the RB 4 kernel it would replace; its rule asked for 10 % faster | No go |
 | Prompt chunk size chosen by prompt length | the same output on 25 of 31 cases, and 522 MiB more on the stage-1 cards | Rejected: its timing effect showed only at about 6.5K to 9.5K new tokens |
-| A draft model on a separate GPU over the network | one draft round took 42.6 ms at the median against a bar of 4.5 ms; the draft head alone runs in 1.7 ms there | Not admitted: the network round trip is the cost. The local drafter costs 0.64 ms of a 25 ms round |
+| A draft model on a separate GPU over the network | one draft round took 42.6 ms at the median against a bar of 4.5 ms; the draft head alone runs in 1.7 ms there | Not admitted: the network round trip is the cost, not the head. On these cards a decode round is about 25 ms and the local drafter is 0.64 ms of it, so even a 2.8 ms remote step would cost about 8 % of decode speed. What moving the drafter off the V100s would buy is card memory, not time. This row is the network case only; it says nothing about a drafter on another card in the same host |
 | The first prompt-reading variant | its first read of one long chat stopped the host or a card three times out of three | After a change to the host's power delivery it read nine of nine long chats; cause not proven |
 | Compressed records are not official precision | on synthetic inputs an expert's compressed record is far from its official record (relative error 0.60 to 0.69 in three layers) | This is why the build reports the share of decode routes that run at NVFP4 |
 | The promoted set is fixed | It is chosen once, from four kinds of text | Text unlike those may route more often to compressed records |

@@ -8,6 +8,27 @@ The method exists because of one fact about this work: a change that makes a lar
 can also make it quietly wrong, and the people (and coding agents) making the change want it to have worked. Every
 rule below removes one way of fooling yourself. Most were added after the failure they prevent.
 
+## 0. Before any of this: launch first, read upstream first
+
+The rules below apply where a result is claimed. They are not a licence to test forever, and the founder said so
+more than once during this work.
+
+- **Launch the proven recipe before testing anything of your own.** In September 2026 a hand-built runtime for an
+  earlier model absorbed days of screening and decoded at 1.13 tok/s. The upstream 1Cat-vLLM route, launched as
+  published, gave about 49 tok/s on the same eight cards
+  ([record](../optimizations/earlier-builds.md#glm-53-flash-nvfp4-on-eight-v100s-with-1cat-vllm-september-2026)).
+- **Read upstream before planning.** A plan was once written on the premise that a 4-bit format could not help on
+  Volta, while v100-skinny already ran that format at 77 % of the card's read ceiling. Since then each build keeps
+  a page of front-line upstream facts (formats, measured ceilings, the pull requests on its path, known traps) and
+  every plan says, for each fact it touches, whether upstream already built or measured it.
+- **A test exists to decide something.** Repeating conservative tests is not a search for optimizations. Read other
+  people's code, try the larger idea, and spend rigor on the claim you will publish. Upstream changes that their
+  author measured go in on correctness and stability and are measured afterwards; our own ideas are measured first.
+- **Look at the result whole.** A stack of checks and conditions can all pass while the answer on the screen is
+  wrong or the server is five times slower. One such slowdown (about 130 tok/s to about 21 on a serving build,
+  2026-11-06) was noticed by the person using it, not by any check.
+- **A test window needs no permission and no ceremony.** Decide, run it, report.
+
 ## 1. Three labels, and one word that is never a pass
 
 Every number carries one of three labels.

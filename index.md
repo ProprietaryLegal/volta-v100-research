@@ -46,8 +46,9 @@ repository. The conditions, the context and KV cache figures and the accuracy of
 
 A Tesla V100 is a datacenter GPU from 2017. Four of them on an NVLink board hold 128 GB of fast memory and cost
 about $2,400 used when we bought ours ([part 8](#part-8-the-hardware-what-it-costs-and-what-it-gives)). This page
-is what seventeen days of work on eight and then twelve of them taught us, with DeepSeek-V4.1-Flash-1017, a
-40-layer mixture-of-experts model:
+is what under three weeks of work on eight and then twelve of them taught us, with DeepSeek-V4.1-Flash-1017, a
+40-layer mixture-of-experts model, on hardware bought from February 2026 and after months of serving smaller
+models on it:
 
 - **It works, and it is fast enough to use.** On eight cards, MEASURED 2026-11-05: at 128K tokens of context,
   183 tok/s writing code and 111 tok/s writing legal text; 2,200 tok/s reading the prompt; 524K tokens of context
@@ -281,6 +282,19 @@ The full method, as a reusable document, is [method/testing.md](method/testing.m
    Closeness cannot show closeness to the original model if the reference is a quantization.
 8. **Checks run on real logs before a window.**
 
+**The other half of the method: do not test forever.** The rules above apply where a result is claimed. They are
+not a reason to circle. Three corrections from the founder shaped the work as much as any rule:
+
+- *Launch the proven recipe first.* In September a hand-built runtime for an earlier model had absorbed days of
+  testing and decoded at 1.13 tok/s. The upstream 1Cat-vLLM recipe, launched as its authors publish it, gave about
+  49 tok/s on the same cards the same week ([earlier builds](optimizations/earlier-builds.md#glm-53-flash-nvfp4-on-eight-v100s-with-1cat-vllm-september-2026)).
+- *Read upstream before planning.* A plan was once drawn up on the premise that a 4-bit format could not help on a
+  card without 4-bit hardware, while v100-skinny already ran exactly that format at 77 % of the card's read
+  ceiling. Since then every build keeps a page of front-line upstream facts, and no plan is written before it is
+  read.
+- *A test exists to decide something.* Repeating conservative tests is not searching for optimizations; reading
+  other people's code is. And a pile of checks is no substitute for looking at the final result whole.
+
 **What went wrong.** These are the most useful paragraphs on the page.
 
 - *Our own checks spoiled test arms five times on one build.* A pattern for out-of-memory lines matched the
@@ -295,6 +309,10 @@ The full method, as a reusable document, is [method/testing.md](method/testing.m
 - *Isolated kernel benchmarks were wrong in both directions.* One predicted 0.03 ms for a change that gave 0.42.
 - *A cached answer is not a cold answer.* On the unmodified engine, a reply after a cache hit can differ from a
   cold read of the same prompt at near-tied tokens. A test that assumes otherwise fails correct code.
+- *A slowdown its user caught first.* On 2026-11-06 one-stream decode on the serving build fell from about 130
+  tok/s to about 21, and it was the person using it who noticed, not the campaign's checks. Use stopped until it
+  was measured fixed. A serving build needs a speed check that runs without being asked; ours now probes every
+  boot.
 - *A sum is not a rate.* "Four requests: 306.6 tok/s" was a sum of four rates. By wall clock it was 242.6.
 
 **What an independent review found.** After the twelve-card build was serving, a second model was given the whole
@@ -315,7 +333,7 @@ The long form is [method/decision-table.md](method/decision-table.md). The short
 | It does not fit the cards at the precision you want | lower the precision of the least-used weights, or add a board. Do not read weights from host RAM in decode | about a millisecond per expert per layer if you do |
 | One request at a time | the decode-round levers; synchronous scheduling | 31 ms down to 23 ms per round on our eight cards |
 | Several long chats taking turns | one slot per chat, for its cache | seconds, not tens of seconds, to the first token |
-| Several requests truly at once | slots up to the number of stages | 1.3 to 1.5 times one stream; little beyond |
+| Several requests truly at once | slots up to the number of stages | 1.3 to 1.5 times one stream; little beyond. The aim was high total throughput from several long requests at once; on this engine a pipeline step carries one request, so the gain stops at the number of stages. Batched decode inside a step exists upstream ([#1482](https://github.com/1CatAI/1Cat-vLLM/pull/1482)) and is not in these builds |
 | Prompts over 32K | keep-batch, the prefill skip, the transport setting, live-context index scoring | first token -9 to -31 %; decode round -10 to -25 % |
 | A chat whose earlier turns come back slightly changed | snapshot the window state; keep system notes in place | 0.5 to 0.7 s in place of 11 to 31 s |
 | Answers must be bit-identical | only the rows marked bitwise, exact or identical | you give up about 0.9 ms per round and part of the prompt-reading gain |
@@ -404,7 +422,7 @@ expert at the precision of NVIDIA's NVFP4 pack. The data stays in the room.
 | **PCIe and NVLink topology** | NVLink only inside a board of four. "v100s are stuck at pcie3. 4 card board max out at x8" ([comment](https://www.reddit.com/r/homelab/comments/1xoumr9/lawyers_v100_homelab_update_two_4card_sxm2_nvlink/19s73lsd7uchs/)). Everything larger is pipeline stages over PCIe, and the layout rules of [part 3](#part-3-how-it-was-made-to-work-under-1cat-vllm) are not optional |
 | **Host memory matters too** | "One memory channel threw four uncorrected ECC errors, three of them while loading the model". The cure was a lower memory speed. The model's lookup tables alone want 110 GB of RAM, resident |
 | **Driver and CUDA support are ending** | "NVIDIA R580, the last driver branch that still supports Volta. These cards are on borrowed time software-wise and I've made peace with that." CUDA 13.0 removed Volta from its compiler; PyTorch keeps it only in CUDA 12.6 builds ([announcement](https://dev-discuss.pytorch.org/t/dropping-volta-support-from-cuda-12-8-binaries-for-release-2-11/3290)); upstream vLLM dropped it. You will pin versions and live on a fork |
-| **Your time** | Seventeen days of daily work, with coding agents, to get from "it runs" to these numbers. The builder skill below exists to shorten that |
+| **Your time** | The cards and boards date from February 2026. Months of serving smaller models on them came first; then under three weeks of daily work with coding agents (2026-10-30 to 11-17) took DeepSeek-V4.1 from "it runs" to these numbers. The builder skill below exists to shorten that |
 
 Per token, from the same measurement (cards and CPU only, one request at a time): "uncached input is about 0.13 kWh
 per 1M tokens on 64K-128K prompts [...] code at about 200 tok/s is about 1.6 kWh per 1M output tokens, legal

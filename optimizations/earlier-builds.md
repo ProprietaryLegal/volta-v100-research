@@ -18,6 +18,30 @@ Repository: <https://github.com/ProprietaryLegal/deepseek-v4-flash-v100>
 What it taught the later builds: a model can look healthy while being wrong, so every later change carries an
 output check; and adding boards without a layout that respects PCIe makes things slower.
 
+## GLM-5.3-Flash NVFP4 on eight V100s with 1Cat-vLLM (September 2026)
+
+The first fast large-model build on these boards, and the one that set the working rule for everything after it.
+Record: PLI Labs' research archive (the launch note is not published; the
+[1Cat-vLLM archaeology note](../research/volta/deepseek-v4.1-flash/1CAT_ARCHAEOLOGY.md) cites it). Engine and
+recipe: 1Cat-vLLM's own GLM route, by its authors. MEASURED 2026-09-17 to 09-23 on eight V100-SXM2-32GB.
+
+| Finding | Number | Note |
+|---|---|---|
+| A runtime written from scratch against the upstream recipe | 1.13 tok/s from our own native runtime; about 49 tok/s from the upstream 1Cat-vLLM route on the same eight cards, with no speculative drafter | **Launch the proven upstream recipe first.** Days had gone into testing the hand-built path. UPSTREAM reference for the same model: 53.0 tok/s ([1Cat-vLLM #402](https://github.com/1CatAI/1Cat-vLLM/pull/402)) |
+| With the DFlash2 speculative drafter, seven drafts per round, two stages of four cards | 78.8 to 113.8 tok/s on short prompts; 75.0 tok/s after a 147K-token prompt, 67.9 after 186K; prefill 300 to 434 tok/s | context 204,800 tokens, about 197K usable; needles 5 of 5 at 147K |
+| The same model as one tensor-parallel group of eight, no pipeline | 60.5 to 141.2 tok/s across five workloads: 20 to 28 % more decode and about four times the prefill of two stages of four | For this model the single group won, because a pipeline with one request leaves a stage idle half the time. For DeepSeek-V4.1 the same layout lost ([measured later](volta-12x-amplify.md#rejected)). **A layout result belongs to a model**; measure it again |
+| A card fault | an NVLink error (Xid 74) took two cards out of service on 2026-09-22 | the build moved to the remaining boards |
+
+## Qwen3.8-27B on four-card boards (September and October 2026)
+
+A 27B model fits one board, so it runs as plain tensor parallel 4 with a speculative drafter on the stock 1Cat-vLLM
+wheel. Variants run in these weeks: the NVFP4 build with multi-token prediction, two servers on one four-card
+board (two cards each), and Swift 1.5, a fine-tune in the same format. The published measurement is
+[swift-1.5-v100](https://github.com/ProprietaryLegal/swift-1.5-v100): 247.7 tok/s decode at a 12K prompt on four
+cards. In the founder's words at the time
+([comment, 2026-10-31](https://www.reddit.com/r/LocalLLaMA/comments/1xk20x5/lawyer_with_too_many_gpus_part_3_deepseekv41flash/19ry1nqtiytqb/)):
+"I am able to get like 200+ tok/s decode on qwen 3.8 across 2 cards at full context, and 260 tok/s across 4 cards."
+
 ## DeepSeek-V4.1-Flash, the first twelve-card port (October 2026)
 
 Pull request: [1Cat-vLLM #1031](https://github.com/1CatAI/1Cat-vLLM/pull/1031) · record:

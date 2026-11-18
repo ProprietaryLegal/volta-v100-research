@@ -34,6 +34,10 @@ notes under [research/](research/README.md) carry their own reference lists, the
 | [0rand/deepseek-v41-tensorfold-spark](https://github.com/0rand/deepseek-v41-tensorfold-spark) | The same idea in a DGX Spark recipe; expert top-p pruning (tested here, lost) |
 | [sudoingX/dgx-spark-deepseek-v41](https://github.com/sudoingX/dgx-spark-deepseek-v41) | The two-Spark launcher. sudoingX also wrote the `p4_kld.py` fidelity method behind Volta sPLIt's next-token agreement figures |
 | [Peuqui/triton](https://github.com/Peuqui/triton) | The Triton fork behind 1Cat's tensor-core prefill routes |
+| [basetenlabs/deepseek-ultrafast](https://github.com/basetenlabs/deepseek-ultrafast) | Read and ported in a private working repository; the twelve-card build's conversation store comes out of that work |
+| [Leonccaa/ReVolta](https://github.com/Leonccaa/ReVolta) (Apache-2.0) | Another V100 inference server; reviewed for ideas during the twelve-card work |
+| [mw00/project-maya](https://github.com/mw00/project-maya) (MIT), [lxe/dsx](https://github.com/lxe/dsx) (MIT) | Other engines for the same model family on consumer cards; read as research leads |
+| An NVIDIA developer-forum thread on GLM-5.3-Flash NVFP4 on eight V100s, and a Reddit post by the 1Cat authors on two years of making P100 and V100 cards work (September 2026; not linked: we could not confirm the addresses) | Where the 1Cat-vLLM work started for us |
 | [ggml](https://github.com/ggml-org/ggml); [llama.cpp issue #25382](https://github.com/ggml-org/llama.cpp/issues/25382) | The GGUF and IQ formats; the quantized key-cache bug report |
 
 ## Models and weights

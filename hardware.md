@@ -124,6 +124,14 @@ Many cards are sold with a heatsink already fitted; those are the easy ones.
 | 2,000 W power supply with multiple PCIe cables (sold for mining rigs) | Feeds a board's 8-pin connectors | $72.87 (March 2026) | [item](https://www.ebay.com/itm/317913093741) | [search](https://www.ebay.com/sch/i.html?_nkw=2000W+PSU+Mining+Power+Supply+PCI-E+cables) |
 | 8-pin to 6+2-pin PCIe power cables, two-pack | Extra runs to the boards | $64.77 (March 2026) | [item](https://www.ebay.com/itm/285446612373) | [search](https://www.ebay.com/sch/i.html?_nkw=EVGA+8-Pin+to+6%2B2pin+PCI-E+Power+Cable) |
 
+Power caps tried over the year, from the builds' records: 245 W per card (July 2026); 190 W with a 1,395 MHz clock
+cap, then 175 W (October); 180 W and 1,425 MHz (1 November); 150 W and 1,522 MHz (the eight-card measurements);
+175 W (mid-November); 150 W and then 200 W with a 1,477 MHz cap on twelve cards. Two findings survive all of them:
+"Clock caps matter more than power caps on these cards", and decode does not care about the power cap (200 W in
+place of 150 W measured neutral on eight cards and under 2 % on twelve), while prompt reading does (+13.7 % on
+twelve cards). Clocks are set a little under the hardware maximum of 1,530 MHz and the setting is made to survive
+a reboot.
+
 Budget, from the builds' own measurements: at a 150 W cap eight cards drew about 965 W in decode and 458 W idle
 (about 57 W a card doing nothing). The eight-card machine was built on two ordinary office circuits with 2,800 W
 of supply. One fault that looked like PCIe turned out, as far as could be told, to be one bad power supply in a
@@ -222,6 +230,11 @@ and the builds' pages:
 | **A card linked at half width** | "One GPU linked at x4 instead of x8 the last time I checked, with zero replays." | Reseating it was the plan |
 | **A slower boot after a memory change** | "Adding RAM changed how the BIOS lays out memory, and one boot that day read prompts 40 to 55 % slower with identical output." | Not explained. "Every boot now gets a 10 second speed probe before I trust it." |
 | **A transfer that hangs** | On the host with 1 TB of RAM, a direct transfer between two cards behind one PCIe host bridge hangs | The two pipeline stages pair their cards across bridges ([source](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4#hardware)) |
+| **Supplies tripping under load** | In October 2026, with twelve cards on the supplies and circuits then available, power supplies tripped under full load | A standing rule until the wiring changed: full load on no more than eight cards at once, and at most two requests per board; raised to three after other equipment was moved off the circuit |
+| **All twelve cards dropping off the bus** | Under load in October 2026 | Lower caps: 190 W per card and a 1,395 MHz clock cap, later 175 W, then 150 W |
+| **A failed power strip** | It dropped the host | Replaced. Power strips are part of the build |
+| **An NVLink fault** | An NVLink error (Xid 74) took two cards out of service in September 2026 | The cards were drained and the build moved to other boards |
+| **A BIOS tuning test that changed nothing** | A fenced test of BIOS settings for speed (2026-11-13): no difference; a memory remap did not give a single NUMA node | Every setting put back to Auto |
 | **Card errors during a bad software test** | Four cards logged an Xid 43 error during one test of a faulty engine change on the twelve-card build | The engine fix; the cards were not at fault |
 
 ## The drawbacks, in one list
