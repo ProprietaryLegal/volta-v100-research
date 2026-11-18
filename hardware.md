@@ -8,8 +8,9 @@ Read this first:
 
 - **Prices are rough used-market figures from 2026, and they move.** Used V100 cards more than doubled during the
   year ([below](#what-it-costs)).
-- **Every part has a link.** Where there is a listing of the exact part, it is linked, with a search for the same
-  words beside it, because listings end. None is an endorsement, and none is an affiliate link.
+- **Every part has a link.** Where a listing of the exact part was still up on November 18, 2026, it is linked,
+  with a search for the same words beside it. Listings end, so the other parts have the search alone. None is an
+  endorsement, and none is an affiliate link.
 - **This is used datacenter hardware with no warranty.** The last section is the list of what went wrong.
 
 <p><img src="assets/photos/four-card-board-top.jpg" alt="A four-card SXM2 NVLink board from above: four V100 modules under their heatsinks" width="520"></p>
@@ -44,16 +45,16 @@ card behind them is an RTX 3090, not part of the V100 boards.)*
 
 | Qty | Part | What it is for | Roughly | Links |
 |---|---|---|---|---|
-| 4 | **Tesla V100 SXM2 32GB** module. The same module is sold under several part numbers: 699-2G503-0203-220, 699-2G503-0280-200, 699-2G503-0204-200, 900-2G503-0010-000 | The GPU: 32 GB each, 128 GB a board | $450 to $700 each during 2026; about $900 by November | [listing](https://www.ebay.com/itm/336412326832) · [search](https://www.ebay.com/sch/i.html?_nkw=NVIDIA+Tesla+V100+SXM2+32GB) |
-| 4 | SXM2 heatsink, aluminium or copper, 6 to 11 cm high | One per module. Many cards are sold with one fitted; then you need none. A lower heatsink needs more air | $50 to $100 each | [listing](https://www.ebay.com/itm/267578097135) · [search](https://www.ebay.com/sch/i.html?_nkw=NVIDIA+Tesla+Heatsink+V100+SXM2) |
+| 4 | **Tesla V100 SXM2 32GB** module. The same module is sold under several part numbers: 699-2G503-0203-220, 699-2G503-0280-200, 699-2G503-0204-200, 900-2G503-0010-000 | The GPU: 32 GB each, 128 GB a board | $450 to $700 each during 2026; about $900 by November | [search](https://www.ebay.com/sch/i.html?_nkw=NVIDIA+Tesla+V100+SXM2+32GB) |
+| 4 | SXM2 heatsink, aluminium or copper, 6 to 11 cm high | One per module. Many cards are sold with one fitted; then you need none. A lower heatsink needs more air | $40 to $100 each | [aluminium, 11 cm](https://www.ebay.com/itm/406626697395) · [copper pipes, 9 cm](https://www.ebay.com/itm/358376572892) · [search](https://www.ebay.com/sch/i.html?_nkw=NVIDIA+Tesla+Heatsink+V100+SXM2) |
 | 1 | Thermal paste, rated for bare dies | Between each module and its heatsink, for a card sold without a heatsink or one you re-seat | - | [search](https://www.ebay.com/sch/i.html?_nkw=thermal+paste+GPU+bare+die) |
 | 1 | **Four-card SXM2 NVLink baseboard**, sold as "V100 4-card Quad-GPU SXM2 300G NVLINK 300GB/s Interconnection Baseboard Solution" (silkscreen `YMZX-4GPU-Q1` on ours) | Four SXM2 sockets with NVLink between all four cards; one SlimSAS port per card to the host; PCIe 8-pin power connectors along the edge | $800 to $900 | [listing](https://www.ebay.com/itm/298083941971) · [search](https://www.ebay.com/sch/i.html?_nkw=V100+4-card+Quad-GPU+SXM2+NVLINK+Baseboard) |
-| 1 or 2 | **PCIe switch card**, x16 to four SlimSAS (SFF-8654 8i) ports: PLX8749 / PEX8749, PCIe 3.0 | Brings the cards' PCIe links into one x16 slot of the host. One switch card can carry a whole board. The eight-card builds use two per board, with two GPUs on each | $125 to $220 each; the higher price is a kit with four cables | [kit with cables](https://www.ebay.com/itm/136933479189) · [card alone](https://www.ebay.com/itm/146916627492) · [search](https://www.ebay.com/sch/i.html?_nkw=PLX8749+PCI+Express+x16+to+4x+SFF-8654+8I+Adapter) |
-| 4 | SlimSAS cable, SFF-8654 8i to SFF-8654 8i, 74-pin | One per card, from the switch card to the baseboard | about $45; a switch-card kit includes four | [listing](https://www.ebay.com/itm/287088139317) · [search](https://www.ebay.com/sch/i.html?_nkw=Slimline+SAS+4.0+SFF-8654+8i+74pin+cable) |
-| 1 | Power supply with enough PCIe 8-pin leads for the board. The builds use 2,000 W units sold for mining rigs | Feeds the board's 8-pin connectors | about $75 | [listing](https://www.ebay.com/itm/317913093741) · [search](https://www.ebay.com/sch/i.html?_nkw=2000W+PSU+Mining+Power+Supply+PCI-E+cables) |
+| 1 or 2 | **PCIe switch card**, x16 to four SlimSAS (SFF-8654 8i) ports: PLX8749 / PEX8749, PCIe 3.0 | Brings the cards' PCIe links into one x16 slot of the host. One switch card can carry a whole board. The eight-card builds use two per board, with two GPUs on each | $125 to $220 each; the higher price is a kit with four cables | [search](https://www.ebay.com/sch/i.html?_nkw=PLX8749+PCI+Express+x16+to+4x+SFF-8654+8I+Adapter) |
+| 4 | SlimSAS cable, SFF-8654 8i to SFF-8654 8i, 74-pin | One per card, from the switch card to the baseboard | about $45; a switch-card kit includes four | [search](https://www.ebay.com/sch/i.html?_nkw=Slimline+SAS+4.0+SFF-8654+8i+74pin+cable) |
+| 1 | Power supply with enough PCIe 8-pin leads for the board. The builds use 2,000 W units sold for mining rigs | Feeds the board's 8-pin connectors | about $75 | [search](https://www.ebay.com/sch/i.html?_nkw=2000W+PSU+Mining+Power+Supply+PCI-E+cables) |
 | as needed | 8-pin to 6+2-pin PCIe power cables | Extra runs to the board | about $65 for two | [listing](https://www.ebay.com/itm/285446612373) · [search](https://www.ebay.com/sch/i.html?_nkw=8-Pin+to+6%2B2pin+PCI-E+Power+Cable) |
 | 1 | Moving air: an inline duct fan or a large blower above the board, or a 4U server chassis with front fans | SXM2 modules have no fans ([cooling options](#cooling-options)) | about $310 for a 4U chassis with fans | [duct fan search](https://www.ebay.com/sch/i.html?_nkw=inline+duct+fan+6+inch) · [chassis listing](https://www.ebay.com/itm/146386072740) · [chassis search](https://www.ebay.com/sch/i.html?_nkw=4U+Rackmount+Server+Chassis+RSV-R4000U) |
-| 1 | A mount: an open-air mining frame for 6 to 8 GPUs, or the 4U chassis | Holds the board and lets air reach the heatsinks | $35 to $75 for a frame | [listing](https://www.ebay.com/itm/205872384163) · [search](https://www.ebay.com/sch/i.html?_nkw=Open+Air+Mining+Rig+Frame+8+GPU) |
+| 1 | A mount: an open-air mining frame for 6 to 8 GPUs, or the 4U chassis | Holds the board and lets air reach the heatsinks | $35 to $75 for a frame | [search](https://www.ebay.com/sch/i.html?_nkw=Open+Air+Mining+Rig+Frame+8+GPU) |
 
 Buy the **32 GB** card. A 16 GB SXM2 card looks the same and costs less; every build here needs 32 GB per card. Buy
 the SXM2 module, not the PCIe version of the V100: the PCIe card does not fit these boards.
@@ -69,8 +70,8 @@ One host serves every board.
 
 | Qty | Part | What it is for | Roughly | Links |
 |---|---|---|---|---|
-| 1 | CPU and board with a free PCIe x16 slot for every switch card. The eight-card builds use an AMD Threadripper PRO 3945WX (12 cores) on a Gigabyte MC62-G40 (WRX80, seven slots) | Runs the server; every card's PCIe link ends here | about $150 for the CPU and $530 for the board | CPU: [listing](https://www.ebay.com/itm/335521397445) · [search](https://www.ebay.com/sch/i.html?_nkw=Threadripper+Pro+3945WX). Board: [listing](https://www.ebay.com/itm/176709995609) · [search](https://www.ebay.com/sch/i.html?_nkw=Gigabyte+MC62-G40+WRX80) |
-| 256 GB or more | DDR4 ECC registered memory | The model's lookup tables live in host RAM (110 GB for this model). A build that keeps weights in host RAM needs far more | varies with the market | [listing](https://www.ebay.com/itm/820165092199) · [search](https://www.ebay.com/sch/i.html?_nkw=128GB+DDR4+2666+ECC+RDIMM+3DS) |
+| 1 | CPU and board with a free PCIe x16 slot for every switch card. The eight-card builds use an AMD Threadripper PRO 3945WX (12 cores) on a Gigabyte MC62-G40 (WRX80, seven slots) | Runs the server; every card's PCIe link ends here | about $150 for the CPU and $530 for the board | CPU: [search](https://www.ebay.com/sch/i.html?_nkw=Threadripper+Pro+3945WX). Board: [search](https://www.ebay.com/sch/i.html?_nkw=Gigabyte+MC62-G40+WRX80) |
+| 256 GB or more | DDR4 ECC registered memory | The model's lookup tables live in host RAM (110 GB for this model). A build that keeps weights in host RAM needs far more | varies with the market | [search](https://www.ebay.com/sch/i.html?_nkw=128GB+DDR4+2666+ECC+RDIMM+3DS) |
 | 1 | The host's own ATX power supply | Powers the board, the CPU and the switch cards | - | [search](https://www.ebay.com/sch/i.html?_nkw=ATX+power+supply+1000W+80+Plus) |
 | 1 | A drive with room for the model files. They are large: the published package of one eight-card build is 556 GB | Holds the model. A slow drive only makes loading slower | - | [search](https://www.ebay.com/sch/i.html?_nkw=2TB+NVMe+SSD) |
 | as needed | Power strips rated for the load | Part of the build: a failed power strip has taken the host down | - | [search](https://www.ebay.com/sch/i.html?_nkw=heavy+duty+power+strip+15A) |
