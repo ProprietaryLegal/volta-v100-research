@@ -17,7 +17,8 @@ Nothing here was measured for this page.
 
 - Every figure is MEASURED on 2026-11-17 or early 2026-11-18 on one twelve-V100 server, clock ceiling 1,477 MHz,
   unless a row says ESTIMATE or UPSTREAM. The power limit was 150 W per card until late on the 17th and 200 W
-  after; each row says which. Most 200 W figures are one run.
+  after; each row says which. Most 200 W figures are one run. Rows dated 2026-11-19 were measured at 175 W per
+  card and a 1,452 MHz clock ceiling, the setting the server has run at since the afternoon of 2026-11-18.
 - A change is tested in a **window**: what serves is stopped, test arms boot one change at a time, a rule written
   before the data decides, and the serving build is restored and checked.
 - The build is tuned for long-context agent work: one request at a time, prompts of 60,000 to 200,000 tokens that
@@ -59,13 +60,14 @@ folder; the design is its
 | 200 W in place of 150 W per card | prefill 3,284 to 3,733 tok/s on a 62,263-token prompt (+13.7 %, one run) | power and heat; decode moved by under 2 % | no |
 | Checks on a test port before serving | Every check runs on a test port and writes a record of exactly which code and configuration passed. The serving boot sends no request and starts only on a matching record | a move or a return takes about 3 minutes without a server | - |
 
-## Adopted: engine changes (serving since 2026-11-18; added to this page 2026-11-18 evening)
+## Adopted: engine changes (nine serving since 2026-11-18, the tenth since 2026-11-19)
 
 Every row below was switched on by its own test window: the rule written before the data, one change per boot,
 a reference boot of the same window, the seven accepted long prompts answered token for token, and a rehearsal of
 four grown chats under the memory line. MEASURED on 2026-11-18 at 200 W per card unless the row says otherwise;
 the server has run at 175 W per card and a clock ceiling of 1,452 MHz since the afternoon (the owner's setting after
-a power trip at 200 W). The order is the order they went in.
+a power trip at 200 W). The order is the order they went in; the last row, the tenth switch, went in on 2026-11-19
+and closed the campaign's list.
 
 | Change | What it is | Result | Changes answers? |
 |---|---|---|---|
@@ -78,22 +80,30 @@ a power trip at 200 W). The order is the order they went in.
 | **Turn chunks** (`VLLM_V41_PP_TURN_CHUNKS=3`) | A turn's new tokens are read as a head and three pieces so the three stages overlap them, instead of one block through the pipeline | first token of a turn alone on a 128,000-token chat (medians of 2): +880 tokens 1.131 s against 1.184; +2,048 1.471 against 2.061; +4,200 2.319 against 3.687 (63 %; the line asked at most 75 %); +10,000 3.623 against 4.963 | no (7 of 7; 5 of 5) |
 | **The sparse-attention index on the tensor cores** (`VLLM_V41_INDEX_TC=1`) | The scorer that picks which compressed keys a token attends to, as a tensor-core kernel (two indexed layers on the first stage, three on each of the others) | the decode round at 128,000 tokens 25.829 ms against 26.633 (-0.804 ms, -3.0 %) and 25.719 against 26.677 after many steps (-0.958 ms, -3.6 %); short chats within 0.07 ms; measured in two windows (the first window's rule for its counter line was wrong and was corrected before the second); the reference's round varies about 0.4 ms boot to boot. The 128K read 4,587 tok/s against 4,582; four requests together, fresh text, 337.9 tok/s in sum against 316.6 | no: streamed text equal 22 of 22, 7 of 7 |
 | **Two boots without the drafter answer alike** (the quality window) | Not a change: a check that the served configuration is deterministic across boots with the drafter off | eight forced replies (prompts near 4,200, 94,000, 128,000 and 252,000 tokens, each followed by a turn; 205 tokens at temperature zero) equal in text 8 of 8 across two independent boots | - |
+| **The batched `wo_a` projection at the build's chunk size** (`VLLM_V41_WO_A_BATCHED_4K=1`; MEASURED 2026-11-19, 175 W) | The batched path of one attention projection in prompt reads admitted exactly 8,188-row chunks, so on this build's 4,092-row chunks it never ran; now it admits them | cold reads of 60,705 / 93,025 / 247,948 / 425,779 tokens: 4,663 / 4,741 / 4,531 / 4,309 tok/s against 4,476 / 4,559 / 4,358 / 4,028 in the same window without it (+4.2 / +4.0 / +4.0 / +7.0 %); memory peak 30,832 MiB, the same as without. In the final bench of 2026-11-19 a cold code read at 32K to 256K tokens was 4.8 to 5.0 % faster than in the bench of 2026-11-18 on the same build (4,657 tok/s at 128K) | rounding: against the accepted capture the first divergence came after a median of 58 tokens and the mean absolute log-probability difference was 0.0354 nats, inside the closeness line; the greedy text of a long answer can differ, and with it the drafter's acceptance and the decode rate of that answer, by up to about 9 % either way |
 
 What 175 W costs against 200 W (MEASURED in two windows, not one boot pair): a read of about 426,000 tokens took
-152.0 s at 150 W against 100.8 s at 200 W; decode moved little. The 175 W figures are in the closing bench below.
+152.0 s at 150 W against 100.8 s at 200 W; decode moved little. The 175 W figures of the whole set are the final bench of 2026-11-19, in
+[builds.md](../builds.md#volta-12x-amplify).
 
 ## Tested, not yet in what serves
 
 | Change | Result | Changes answers? | Status |
 |---|---|---|---|
-| **The conversation store** (a chat's state saved to disk) | Every server test passed at four slots: the state check on twelve workers, a 130,000-token chat restored from disk after a restart with its state equal to the saved state and an identical answer, 0 waits over 2,976 saves. A 131,466-token turn restored after a restart reached its first token in 1.23 s, where a cold read took 43.84 s. Card memory with it on was within the sampler's resolution of off | a restored turn is not token-identical to a cold read of the same text (true of any cached turn on this engine) | not switched on: a paired on/off comparison of the first token comes first |
 | A fixed split count in the dense multiply library (`TM_GEMM_TUNE=max_splits=1`) | first divergence from the reference at 96 tokens where the rule asked for 104 | changes rounding | INCONCLUSIVE at its quality line; stays out |
-| A leaner hand-off between stages (fewer copies per step), kernels for the expert dispatch and the dense layers' smaller matrices | being built; each gets its own window | - | not yet on the cards |
 
 ## Rejected
 
+Every row below ran in its own window with a rule written before the data, or was closed by a measurement before a
+window was spent on it. The four rows dated 2026-11-19 closed the campaign's list; the build serves without them.
+
 | Idea | Result | Why |
 |---|---|---|
+| **The conversation store** (a chat's state saved to disk; MEASURED 2026-11-19, 175 W, the serving set of the day) | Every state check passed again at four slots: the dump, a restart on the saved set with exact answers after it, the memory equal to the store-off boot, 0 waits over 1,704 and 624 saves. Its timing line failed: in a four-chat rehearsal (30 requests, largest prompt about 153,600 tokens, four boots off / on / on / off) the median first token of the larger turns was 4.718 and 3.722 s with the store on against 3.596 and 3.590 s off, limit 3.696; the small turns 3.029 and 0.999 s against 2.586 and 2.302 (INCONCLUSIVE, the two on-boots straddle the limit) | Correct in every state check, slower at the first token with it on; the cause is not established (the two on-boots differ from each other more than the off-boots do). Stays off |
+| **A leaner hand-off between stages** (fewer copies per step; MEASURED 2026-11-19, 175 W) | A first kit did not boot: it assumed a hidden size of 4,096 where the model's is 5,120. The fixed kit booted with twelve active hand-offs and answered token for token; the decode round after a cold read of about 128,000 tokens was 25.822 ms against 25.954 without it, 0.133 ms shorter where the rule asked at least 0.3; after a one-step turn 25.947 against 26.253, 0.306 ms shorter but with the two boots' spreads overlapping, unreadable | Under its line; the short-chat cells differed by 12 to 21 % only because the reference boot's short cells spread 24.7 to 44.1 ms, which is noise, not a gain |
+| **The zero padding out of each native expert record** (576 of 640 columns are data; re-cut packs and a sidecar kernel; MEASURED 2026-11-19, 175 W) | Answers identical 7 of 7; 756 to 878 MiB less card memory per card by stage; but the decode round LONGER: 25.990 ms against 25.895 after a one-step turn at 128K (+0.095) and 25.743 against 25.588 after a cold read (+0.155), where the rule asked at least 0.3 ms shorter; short chats +0.27 and +0.90 % | The prediction (0.33 to 0.41 ms shorter) was wrong in sign: the smaller records did not shorten the round. The memory they free is real and recorded |
+| Fused kernels for the native expert layer (five launches and a cast) | Not built: timed per layer on one card at six rows, this build's path 231.9 microseconds against upstream's fused kernels 241.7; the best width of a fused version 0.205 ms a round, under the 0.300 ms gate the plan set for building it | Closed at its timing gate; the existing path is already the faster |
+| Whole 64-row passes in every prompt chunk (a 4,092-row chunk leaves a 60-row remainder on a slower path) | Measured from the profile at under 0.37 % of a chunk | Closed without a window: below the band a window can read |
 | Release the allocator's cache at 512 rows (more often) | the same memory peak; larger turns' first token 10.9 s against 5.2 s | It bought no memory and made turns twice as late |
 | Await each hand-off between stages instead of overlapping it | 31,664 MiB against 31,628 for the plain arm | No memory gain |
 | Three slots at the large prompt chunk | 31,628 MiB, 370 MiB under the limit, against 30,052 at the small chunk | Not chosen |
