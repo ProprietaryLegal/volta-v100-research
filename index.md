@@ -34,7 +34,7 @@ gives and takes, with a parts list.
 Each card is one build on its own hardware, measured under its own conditions, and links to that build's
 repository. The conditions, the context and KV cache figures and the accuracy of each are in [builds.md](builds.md).
 
-[![Volta 12X AmPLIfy: 12x V100-SXM2-32GB; decode about 175 tok/s for one code request at 128K tokens of context, about 94 on legal and 80 on prose; prefill 4,657 tok/s on a 128K code prompt, 4,360 at 256K; three code requests together 392 tok/s summed; KV cache: 524K tokens of context per request, four slots](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-12x-amplify.svg)](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4)
+[![Volta 12X AmPLIfy: 12x V100-SXM2-32GB; decode 157 to 175 tok/s for one code request at 128K tokens of context across the two benches of 2026-11-19 (a decode figure is the generated text's), about 93 on legal and 80 to 86 on prose; prefill 4,670 tok/s on a 128K code prompt, 4,518 at 256K; three code requests together 360 to 392 tok/s summed; KV cache: 524K tokens of context per request, four slots](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-12x-amplify.svg)](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4)
 
 [![Volta Max uPLIft: 8x V100-SXM2-32GB; at 128K context: decode 148 tok/s on code, 146 on JSON, 79 on legal text, 77 on prose; prefill 2,727 to 3,145 tok/s, first token after 43.8 s; three requests together 176 tok/s, same tokens as each alone; KV cache: 524K tokens of context per request, two slots, a follow-up resumes in 0.69 s](https://raw.githubusercontent.com/ProprietaryLegal/ProprietaryLegal/main/assets/volta-max-uplift.svg)](https://github.com/ProprietaryLegal/Volta-Max-uPLIft-FP4-DeepSeek-V4.1-Flash-1017-NVFP4-8xV100-SXM2-PP2xTP4)
 
@@ -52,9 +52,10 @@ models on it:
 
 - **It works, and it is fast enough to use.** On eight cards, MEASURED 2026-11-05: at 128K tokens of context,
   183 tok/s writing code and 111 tok/s writing legal text; 2,200 tok/s reading the prompt; 524K tokens of context
-  per request ([Volta sPLIt](builds.md#volta-split)). On twelve cards, every expert at NVFP4 precision, MEASURED 2026-11-19: about 175 tok/s
-  for one code request at 128K tokens of context (about 94 on legal, 80 on prose) and 4,657 tok/s reading a 128K
-  code prompt ([Volta 12X AmPLIfy](builds.md#volta-12x-amplify)).
+  per request ([Volta sPLIt](builds.md#volta-split)). On twelve cards, every expert at NVFP4 precision, MEASURED 2026-11-19: 157 to 175 tok/s
+  for one code request at 128K tokens of context across the day's two benches (a decode figure is the generated
+  text's; about 93 on legal, 80 to 86 on prose) and 4,670 tok/s reading a 128K code prompt
+  ([Volta 12X AmPLIfy](builds.md#volta-12x-amplify)).
 - **Most of that speed is other people's work**, chiefly the [1Cat-vLLM](https://github.com/1CatAI/1Cat-vLLM) fork
   and the [v100-skinny](https://github.com/dnv2003/v100-skinny) kernels. [Part 3](#part-3-how-it-was-made-to-work-under-1cat-vllm)
   says who did what.
@@ -244,7 +245,7 @@ row.
 ### Volta 12X AmPLIfy (twelve cards, every expert native, all on the cards) · [full table](optimizations/volta-12x-amplify.md)
 
 MEASURED 2026-11-17 and early 2026-11-18 on a twelve-V100 server, 150 W per card unless the row says 200 W, clock
-ceiling 1,477 MHz; the last row on 2026-11-19 at 175 W and a 1,452 MHz ceiling, the final bench of the campaign
+ceiling 1,477 MHz; the last row on 2026-11-19 at 175 W and a 1,452 MHz ceiling, the day's two benches
 ([source](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#measured)).
 
 | Change | Gave | Cost | Answers |
@@ -257,7 +258,7 @@ ceiling 1,477 MHz; the last row on 2026-11-19 at 175 W and a 1,452 MHz ceiling, 
 | Release the allocator's cache only above the chunk size (adopted; serving since 2026-11-18) | prefill **+12.6 % at 61K, +9.9 % at 93K** (200 W, one boot) | none found | identical |
 | *Lost:* a conversation store: a chat's state saved to disk | a 131,466-token turn back after a restart in **1.23 s** where a cold read took 43.84 s; every state check passed, but in a four-chat rehearsal the larger turns' first token was 4.7 and 3.7 s with it on against 3.6 s off (2026-11-19); stays off | - | not token-identical to a cold read |
 | *Lost:* one stage on the same eight cards with no pipeline (one test window) | one request -3 %, three at once -41 %, long reads -26 % | - | - |
-| Ten engine switches adopted one window at a time (p2 to c2a, 2026-11-18 to 2026-11-19; serving since): the allocator release, the middle-stage prompt skip, the loop fixes, the drafter's faster kernel, the token cache, the hold after a prompt's end, the turn pipeline, the tensor-core index scorer, the batched projection in prompt reads at the build's chunk size | one code request at 128K of context: about 175 tok/s cold, prefill 4,657 tok/s; three code streams together 392 tok/s summed; legal and prose about 94 and 80 tok/s and 3,944 / 4,331 tok/s prefill at 128K, final bench 2026-11-19 ([full table](optimizations/volta-12x-amplify.md)). The campaign's list closed on 2026-11-19: the store, a leaner stage hand-off and padding-free expert records each failed their line; two kernel ideas closed at their timing gates | none found in their windows | identical for seven; the index scorer and the batched projection judged by closeness (equal text in 8 of 8 forced replies on two boots; first divergence after a median of 58 tokens). With a document already in the prefix cache, a request's first token comes in under half a second at 128K and three streams on it decode 400 tok/s together on code from the first token on (MEASURED 2026-11-19). |
+| Eleven engine switches adopted one window at a time (p2 to b4a, 2026-11-18 to 2026-11-19; serving since): the allocator release, the middle-stage prompt skip, the loop fixes, the drafter's faster kernel, the token cache, the hold after a prompt's end, the turn pipeline, the tensor-core index scorer, the batched projection in prompt reads at the build's chunk size, the fixed split count in the dense multiply library | one code request at 128K of context: 157 to 175 tok/s cold across the day's two benches (the figure is the text's), prefill 4,670 tok/s; three code streams together 360 to 392 tok/s summed; legal and prose about 93 and 80 to 86 tok/s and 4,538 / 4,586 tok/s prefill at 128K, 2026-11-19 ([full table](optimizations/volta-12x-amplify.md)). The campaign's first list closed on 2026-11-19: the store, a leaner stage hand-off, padding-free expert records and an exact four-card sum each failed their line; two kernel ideas closed at their timing gates | none found in their windows | identical for seven; the index scorer and the batched projection judged by closeness (equal text in 8 of 8 forced replies on two boots; first divergence after a median of 58 tokens). With a document already in the prefix cache, a request's first token comes in under half a second at 128K and three streams on it decode 400 tok/s together on code from the first token on (MEASURED 2026-11-19). |
 
 ### Earlier builds · [full page](optimizations/earlier-builds.md)
 

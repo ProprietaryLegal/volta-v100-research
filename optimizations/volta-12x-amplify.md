@@ -60,14 +60,15 @@ folder; the design is its
 | 200 W in place of 150 W per card | prefill 3,284 to 3,733 tok/s on a 62,263-token prompt (+13.7 %, one run) | power and heat; decode moved by under 2 % | no |
 | Checks on a test port before serving | Every check runs on a test port and writes a record of exactly which code and configuration passed. The serving boot sends no request and starts only on a matching record | a move or a return takes about 3 minutes without a server | - |
 
-## Adopted: engine changes (nine serving since 2026-11-18, the tenth since 2026-11-19)
+## Adopted: engine changes (nine serving since 2026-11-18, the tenth and the eleventh since 2026-11-19)
 
 Every row below was switched on by its own test window: the rule written before the data, one change per boot,
 a reference boot of the same window, the seven accepted long prompts answered token for token, and a rehearsal of
 four grown chats under the memory line. MEASURED on 2026-11-18 at 200 W per card unless the row says otherwise;
 the server has run at 175 W per card and a clock ceiling of 1,452 MHz since the afternoon (the owner's setting after
-a power trip at 200 W). The order is the order they went in; the last row, the tenth switch, went in on 2026-11-19
-and closed the campaign's list.
+a power trip at 200 W). The order is the order they went in; the tenth switch went in on 2026-11-19 and closed the
+campaign's list; the eleventh, the fixed split count, went in the same afternoon as the first item of the plan's next
+tier.
 
 | Change | What it is | Result | Changes answers? |
 |---|---|---|---|
@@ -81,16 +82,17 @@ and closed the campaign's list.
 | **The sparse-attention index on the tensor cores** (`VLLM_V41_INDEX_TC=1`) | The scorer that picks which compressed keys a token attends to, as a tensor-core kernel (two indexed layers on the first stage, three on each of the others) | the decode round at 128,000 tokens 25.829 ms against 26.633 (-0.804 ms, -3.0 %) and 25.719 against 26.677 after many steps (-0.958 ms, -3.6 %); short chats within 0.07 ms; measured in two windows (the first window's rule for its counter line was wrong and was corrected before the second); the reference's round varies about 0.4 ms boot to boot. The 128K read 4,587 tok/s against 4,582; four requests together, fresh text, 337.9 tok/s in sum against 316.6 | no: streamed text equal 22 of 22, 7 of 7 |
 | **Two boots without the drafter answer alike** (the quality window) | Not a change: a check that the served configuration is deterministic across boots with the drafter off | eight forced replies (prompts near 4,200, 94,000, 128,000 and 252,000 tokens, each followed by a turn; 205 tokens at temperature zero) equal in text 8 of 8 across two independent boots | - |
 | **The batched `wo_a` projection at the build's chunk size** (`VLLM_V41_WO_A_BATCHED_4K=1`; MEASURED 2026-11-19, 175 W) | The batched path of one attention projection in prompt reads admitted exactly 8,188-row chunks, so on this build's 4,092-row chunks it never ran; now it admits them | cold reads of 60,705 / 93,025 / 247,948 / 425,779 tokens: 4,663 / 4,741 / 4,531 / 4,309 tok/s against 4,476 / 4,559 / 4,358 / 4,028 in the same window without it (+4.2 / +4.0 / +4.0 / +7.0 %); memory peak 30,832 MiB, the same as without. In the final bench of 2026-11-19 a cold code read at 32K to 256K tokens was 4.8 to 5.0 % faster than in the bench of 2026-11-18 on the same build (4,657 tok/s at 128K) | rounding: against the accepted capture the first divergence came after a median of 58 tokens and the mean absolute log-probability difference was 0.0354 nats, inside the closeness line; the greedy text of a long answer can differ, and with it the drafter's acceptance and the decode rate of that answer, by up to about 9 % either way |
+| **A fixed split count in the dense multiply library** (`TM_GEMM_TUNE=max_splits=1`; MEASURED 2026-11-19, 175 W) | The library that does the dense multiplies picks how many pieces to split a multiply into from the chunk's row count, so a prompt's last chunk (a different row count) was computed under a different split from the rest and rounded differently; now every chunk takes one split | cold reads of 60,706 / 93,028 / 247,953 / 425,783 tokens: 4,659 / 4,756 / 4,552 / 4,314 tok/s against 4,664 / 4,747 / 4,515 / 4,327 without it in the same window (-0.1 / +0.2 / +0.8 / -0.3 %); one fresh request's decode +1.3 %; memory peak 30,832 MiB, the same. In the bench that followed (the afternoon of 2026-11-19) the first and the second cold read of every document agreed within 0.15 s, where the two benches before had read the first legal or prose document 1 to 11 s slower than the second (a hypothesis, not a proof: the split search on a shape not yet seen was the cost, and the fixed count removes it) | rounding: against the accepted capture the answers were identical on 1 of 7 long prompts, the first divergence came after a median of 45 to 48 tokens and the mean absolute log-probability difference was 0.035 to 0.037 nats, inside the closeness line (50 and 0.0307 are the yardstick's); a cache hit is not token-identical to the cold read of the same text in general (identical 4 of 9; see "Rounding" below) |
 
 What 175 W costs against 200 W (MEASURED in two windows, not one boot pair): a read of about 426,000 tokens took
-152.0 s at 150 W against 100.8 s at 200 W; decode moved little. The 175 W figures of the whole set are the final bench of 2026-11-19, in
-[builds.md](../builds.md#volta-12x-amplify).
+152.0 s at 150 W against 100.8 s at 200 W; decode moved little. The 175 W figures of the whole set are the bench of the afternoon of 2026-11-19 (the eleven
+switches), in [builds.md](../builds.md#volta-12x-amplify).
 
 ## Tested, not yet in what serves
 
 | Change | Result | Changes answers? | Status |
 |---|---|---|---|
-| A fixed split count in the dense multiply library (`TM_GEMM_TUNE=max_splits=1`) | first divergence from the reference at 96 tokens where the rule asked for 104 | changes rounding | INCONCLUSIVE at its quality line; stays out |
+| A fixed split count in the dense multiply library (`TM_GEMM_TUNE=max_splits=1`), first window (2026-11-17) | first divergence from the reference at 96 tokens where the rule asked for 104 | changes rounding | INCONCLUSIVE at its quality line then; adopted on 2026-11-19 in a window of its own with a scaled yardstick (the row in the adopted table) |
 
 ## Rejected
 
@@ -102,6 +104,7 @@ window was spent on it. The four rows dated 2026-11-19 closed the campaign's lis
 | **The conversation store** (a chat's state saved to disk; MEASURED 2026-11-19, 175 W, the serving set of the day) | Every state check passed again at four slots: the dump, a restart on the saved set with exact answers after it, the memory equal to the store-off boot, 0 waits over 1,704 and 624 saves. Its timing line failed: in a four-chat rehearsal (30 requests, largest prompt about 153,600 tokens, four boots off / on / on / off) the median first token of the larger turns was 4.718 and 3.722 s with the store on against 3.596 and 3.590 s off, limit 3.696; the small turns 3.029 and 0.999 s against 2.586 and 2.302 (INCONCLUSIVE, the two on-boots straddle the limit) | Correct in every state check, slower at the first token with it on; the cause is not established (the two on-boots differ from each other more than the off-boots do). Stays off |
 | **A leaner hand-off between stages** (fewer copies per step; MEASURED 2026-11-19, 175 W) | A first kit did not boot: it assumed a hidden size of 4,096 where the model's is 5,120. The fixed kit booted with twelve active hand-offs and answered token for token; the decode round after a cold read of about 128,000 tokens was 25.822 ms against 25.954 without it, 0.133 ms shorter where the rule asked at least 0.3; after a one-step turn 25.947 against 26.253, 0.306 ms shorter but with the two boots' spreads overlapping, unreadable | Under its line; the short-chat cells differed by 12 to 21 % only because the reference boot's short cells spread 24.7 to 44.1 ms, which is noise, not a gain |
 | **The zero padding out of each native expert record** (576 of 640 columns are data; re-cut packs and a sidecar kernel; MEASURED 2026-11-19, 175 W) | Answers identical 7 of 7; 756 to 878 MiB less card memory per card by stage; but the decode round LONGER: 25.990 ms against 25.895 after a one-step turn at 128K (+0.095) and 25.743 against 25.588 after a cold read (+0.155), where the rule asked at least 0.3 ms shorter; short chats +0.27 and +0.90 % | The prediction (0.33 to 0.41 ms shorter) was wrong in sign: the smaller records did not shorten the round. The memory they free is real and recorded |
+| **An exact four-card sum** (the large sums between the four cards of a stage added in one fixed order in single precision instead of the communication library's size-dependent order; MEASURED 2026-11-19, 175 W) | On the board, without a model, the exact sum cost 2.2 times the library's call on a large tile (2.632 against 1.180 ms, the four cards bit-identical). Served, it answered the seven accepted long prompts identically on 0 of 7, clean of early wrong tokens, but with the first divergence after a median of 13 tokens where the line asked at least 25 (the yardstick's 50 halved): its answers are farther from the reference than the fixed split count's, not nearer | An exact sum re-rounds every four-card sum of every layer at every row, and the reference was recorded under the library's arithmetic, so the distance measured is between two roundings of the whole network, not the chunk-dependence it was meant to remove. The speed line never ran. Whether an exact, chunking-independent answer is worth a new reference is the owner's decision; closed as built |
 | Fused kernels for the native expert layer (five launches and a cast) | Not built: timed per layer on one card at six rows, this build's path 231.9 microseconds against upstream's fused kernels 241.7; the best width of a fused version 0.205 ms a round, under the 0.300 ms gate the plan set for building it | Closed at its timing gate; the existing path is already the faster |
 | Whole 64-row passes in every prompt chunk (a 4,092-row chunk leaves a 60-row remainder on a slower path) | Measured from the profile at under 0.37 % of a chunk | Closed without a window: below the band a window can read |
 | Release the allocator's cache at 512 rows (more often) | the same memory peak; larger turns' first token 10.9 s against 5.2 s | It bought no memory and made turns twice as late |
@@ -158,6 +161,13 @@ with a probe that needs no model:
 
 No token is shown wrong by either. They explain why "token-identical after a change of chunk size" is the wrong
 test, and why a cached turn is not token-identical to a cold read of the same text.
+
+Both sources were taken into windows on 2026-11-19. The split count was fixed and adopted (the eleventh switch);
+the exact four-card sum was tried and rejected (the tables above). A cache hit was then measured against its own
+cold read on nine prompts of 32K to 128K tokens (greedy, 32 tokens): identical on 4 of 9 (every prose prompt and
+one code prompt), the first difference after a median of 25 tokens on the rest. The hit computes its tail rows in
+another chunking over the cached blocks, through the four-card sums and the expert path, so the remaining
+chunk-dependence lies outside the dense multiplies; whether it is worth a lever is an open item.
 
 ## What went wrong, and what the independent review found
 
