@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" width="760" height="360" role="img" aria-labelledby="t d">
+<title id="t">A candidate: three boards joined by network cards in a ring</title>
+<desc id="d">Three PEX8796 boards, each holding one pipeline stage on its four NVLink-joined V100 cards, each with two network-card ports in its x8 slots. Cables run from stage 1 to stage 2, stage 2 to stage 3, and stage 3 back to stage 1, the same loop a pipeline's hand-offs follow. Each board also keeps its x16 link to the host. Untested.</desc>
+<rect width="760" height="360" fill="#ffffff"/>
+<g font-family="Helvetica, Arial, sans-serif" fill="#1b1f24">
+<text x="20" y="30" font-size="17" font-weight="bold">A candidate, not tested: boards joined by network cards in a ring</text>
+<text x="20" y="52" font-size="12" fill="#57606a">Each board is one pipeline stage. Hand-offs go stage 1 → 2 → 3 → back to 1 over GPUDirect RDMA, off the CPU.</text>
+<g>
+<rect x="30" y="80" width="200" height="150" rx="8" fill="#f6f8fa" stroke="#2da44e" stroke-width="1.5"/>
+<rect x="280" y="80" width="200" height="150" rx="8" fill="#f6f8fa" stroke="#2da44e" stroke-width="1.5"/>
+<rect x="530" y="80" width="200" height="150" rx="8" fill="#f6f8fa" stroke="#2da44e" stroke-width="1.5"/>
+</g>
+<g font-size="13" font-weight="bold" text-anchor="middle"><text x="130" y="102">Board 1: stage 1</text><text x="380" y="102">Board 2: stage 2</text><text x="630" y="102">Board 3: stage 3</text></g>
+<g font-size="11" text-anchor="middle" fill="#57606a"><text x="130" y="122">4 × V100, NVLink</text><text x="380" y="122">4 × V100, NVLink</text><text x="630" y="122">4 × V100, NVLink</text></g>
+<g fill="#ddf4ff" stroke="#0969da" stroke-width="1.2"><rect x="80" y="134" width="100" height="30" rx="4"/><rect x="330" y="134" width="100" height="30" rx="4"/><rect x="580" y="134" width="100" height="30" rx="4"/></g>
+<g font-size="12" text-anchor="middle"><text x="130" y="154">PLX8796</text><text x="380" y="154">PLX8796</text><text x="630" y="154">PLX8796</text></g>
+<g fill="#fff8c5" stroke="#9a6700" stroke-width="1.2">
+<rect x="45" y="185" width="70" height="30" rx="4"/><rect x="145" y="185" width="70" height="30" rx="4"/>
+<rect x="295" y="185" width="70" height="30" rx="4"/><rect x="395" y="185" width="70" height="30" rx="4"/>
+<rect x="545" y="185" width="70" height="30" rx="4"/><rect x="645" y="185" width="70" height="30" rx="4"/>
+</g>
+<g font-size="10" text-anchor="middle"><text x="80" y="204">NIC in (x8)</text><text x="180" y="204">NIC out (x8)</text><text x="330" y="204">NIC in (x8)</text><text x="430" y="204">NIC out (x8)</text><text x="580" y="204">NIC in (x8)</text><text x="680" y="204">NIC out (x8)</text></g>
+<g stroke="#bc4c00" stroke-width="3" fill="none">
+<path d="M180 215 V250 H330 V215"/>
+<path d="M430 215 V250 H580 V215"/>
+<path d="M680 215 V290 H80 V215"/>
+</g>
+<g font-size="11" fill="#bc4c00" text-anchor="middle"><text x="255" y="266">stage 1 → 2</text><text x="505" y="266">stage 2 → 3</text><text x="380" y="306">stage 3 → back to stage 1 (the next token)</text></g>
+<text x="380" y="336" font-size="11" fill="#57606a" text-anchor="middle">Each board keeps its one x16 link to the host as well. An x8 PCIe 3.0 slot carries at most about 7.9 GB/s each way.</text>
+</g>
+</svg>

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 380" width="760" height="380" role="img" aria-labelledby="t d">
+<title id="t">Topology of the PEX8796 four-card V100 board</title>
+<desc id="d">One PCIe 3.0 x16 link runs from the host CPU to the PLX8796 switch on the board. The switch gives each of the four V100 cards a PCIe 3.0 x16 link and feeds two PCIe 3.0 x8 slots. The four V100 cards are joined to each other by NVLink 2.0. Redrawn in English from the maker's diagram.</desc>
+<rect width="760" height="380" fill="#ffffff"/>
+<g font-family="Helvetica, Arial, sans-serif" fill="#1b1f24">
+<text x="20" y="30" font-size="17" font-weight="bold">The PEX8796 board: one x16 link in, four x16 to the cards, two x8 slots</text>
+<rect x="300" y="50" width="160" height="40" rx="6" fill="#f6f8fa" stroke="#57606a" stroke-width="1.2"/>
+<text x="380" y="75" font-size="14" font-weight="bold" text-anchor="middle">Host CPU</text>
+<line x1="380" y1="90" x2="380" y2="140" stroke="#0969da" stroke-width="5"/>
+<text x="392" y="120" font-size="12" fill="#0969da">PCIe 3.0 x16 (SlimSAS cables)</text>
+<rect x="20" y="132" width="720" height="236" rx="8" fill="none" stroke="#2da44e" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="32" y="152" font-size="12" fill="#2da44e" font-weight="bold">on the board</text>
+<rect x="280" y="140" width="200" height="40" rx="6" fill="#ddf4ff" stroke="#0969da" stroke-width="1.5"/>
+<text x="380" y="165" font-size="14" font-weight="bold" text-anchor="middle">PLX8796 switch (96 lanes)</text>
+<line x1="380" y1="180" x2="380" y2="205" stroke="#0969da" stroke-width="3"/>
+<line x1="85" y1="205" x2="675" y2="205" stroke="#0969da" stroke-width="3"/>
+<g stroke="#0969da" stroke-width="4">
+<line x1="85" y1="205" x2="85" y2="250"/><line x1="185" y1="205" x2="185" y2="250"/><line x1="285" y1="205" x2="285" y2="250"/><line x1="385" y1="205" x2="385" y2="250"/>
+</g>
+<g stroke="#0969da" stroke-width="2"><line x1="545" y1="205" x2="545" y2="250"/><line x1="675" y1="205" x2="675" y2="250"/></g>
+<g font-size="11" fill="#0969da" text-anchor="start">
+<text x="93" y="232">x16</text><text x="193" y="232">x16</text><text x="293" y="232">x16</text><text x="393" y="232">x16</text><text x="553" y="232">x8</text><text x="683" y="232">x8</text>
+</g>
+<g fill="#ffffff" stroke="#1b1f24" stroke-width="1.2">
+<rect x="45" y="250" width="80" height="44" rx="5"/><rect x="145" y="250" width="80" height="44" rx="5"/><rect x="245" y="250" width="80" height="44" rx="5"/><rect x="345" y="250" width="80" height="44" rx="5"/>
+</g>
+<g font-size="13" text-anchor="middle" font-weight="bold"><text x="85" y="277">V100 1</text><text x="185" y="277">V100 2</text><text x="285" y="277">V100 3</text><text x="385" y="277">V100 4</text></g>
+<g fill="#fff8c5" stroke="#9a6700" stroke-width="1.2"><rect x="495" y="250" width="100" height="44" rx="5"/><rect x="625" y="250" width="100" height="44" rx="5"/></g>
+<g font-size="12" text-anchor="middle"><text x="545" y="270">PCIe slot</text><text x="545" y="286">x8</text><text x="675" y="270">PCIe slot</text><text x="675" y="286">x8</text></g>
+<path d="M85 294 V325 H385 V294 M185 294 V325 M285 294 V325" fill="none" stroke="#bc4c00" stroke-width="4"/>
+<text x="235" y="348" font-size="12" fill="#bc4c00" text-anchor="middle" font-weight="bold">NVLink 2.0: all four cards joined</text>
+<text x="610" y="320" font-size="11" fill="#57606a" text-anchor="middle">maker's uses: network card</text>
+<text x="610" y="336" font-size="11" fill="#57606a" text-anchor="middle">(GPUDirect RDMA) or NVMe drive</text>
+<text x="610" y="352" font-size="11" fill="#57606a" text-anchor="middle">(GPUDirect Storage)</text>
+</g>
+</svg>

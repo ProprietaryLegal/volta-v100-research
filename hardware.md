@@ -90,6 +90,12 @@ memory channel threw uncorrected ECC errors at DDR4-3200 until the speed was low
   (PCIe 4.0) switch card, x16 to ten SlimSAS ports, about $530
   ([listing](https://www.ebay.com/itm/820323407368) · [search](https://www.ebay.com/sch/i.html?_nkw=PLX88096+PCIe+4.0+x16+SlimSAS+SFF-8654+Switch+Adapter)); the
   third board sits behind one PLX8749.
+- **A newer board with its own switch.** Since mid-2026 a green four-card board is sold with a Broadcom PLX8796
+  switch on the board itself and two PCIe 3.0 x8 slots on its edge: one x16 link to the host feeds all four cards
+  (each at x16 to the switch) and the two slots. Its maker says the slots are for a network card (GPUDirect RDMA,
+  for joining machines into a cluster) or an NVMe drive. It does not give a faster PCIe path between boards; the
+  slots could carry a network path instead. We have not tested it. The maker's specification sheet, translated, and
+  what the board would and would not change: [research note](research/hardware/pex8796-switch-board.md).
 
 <p><img src="assets/photos/copper-and-aluminium-heatsinks.jpg" alt="Copper and aluminium SXM2 heatsinks side by side, with a small fan between them" width="520"></p>
 

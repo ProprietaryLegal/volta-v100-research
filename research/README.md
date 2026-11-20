@@ -68,6 +68,12 @@ ended at about 3 tok/s and an overall FAIL of its exactness gates, and it is dir
 | [volta/deepseek-v4.1-flash/NLL_GAP.md](volta/deepseek-v4.1-flash/NLL_GAP.md) | How much of a quality gap came from the port's precision choices (answer: almost none) |
 | [volta/deepseek-v4.1-flash/E2E_FINAL.md](volta/deepseek-v4.1-flash/E2E_FINAL.md) | The final end-to-end campaign and its FAIL. Three raw API responses were removed: generated model text is not published here |
 
+## Hardware
+
+| File | What it holds | Date |
+|---|---|---|
+| [hardware/pex8796-switch-board.md](hardware/pex8796-switch-board.md) | The newer four-card board with a PLX8796 switch and two x8 slots: its maker's specification sheet translated from Chinese, what the slots are for, and whether it gives a faster path between boards (not tested by us) | 2026-11-20 |
+
 ## Not copied here, and where to find it
 
 | Material | Why not | Where |
