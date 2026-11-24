@@ -13,6 +13,8 @@ Its sources are the build's
 and [its time budget](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4/blob/main/research/TWELVE-CARD-TIME-BUDGET.md).
 Nothing here was measured for this page.
 
+**Update 2026-11-24.** The tables below are the record as of 2026-11-19. That evening (window x2) the owner had everything built switched on, the conversation store included, and the server has served with it since. It serves `PP3KIT11-over-cut` from 2026-11-24 with twenty adopted lines: the eleven switches below plus the store, the lean stage hand-off, padding-free expert records, the mHC kernel and their settings. The repository's [fifth release](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#readme) gives what serves now, its measured speeds and the levers closed since.
+
 ## How to read the tables
 
 - Every figure is MEASURED on 2026-11-17 or early 2026-11-18 on one twelve-V100 server, clock ceiling 1,477 MHz,

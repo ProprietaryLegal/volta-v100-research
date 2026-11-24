@@ -248,6 +248,8 @@ MEASURED 2026-11-17 and early 2026-11-18 on a twelve-V100 server, 150 W per card
 ceiling 1,477 MHz; the last row on 2026-11-19 at 175 W and a 1,452 MHz ceiling, the day's two benches
 ([source](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#measured)).
 
+**Update 2026-11-24.** The tables below are the record as of 2026-11-19. That evening (window x2) the owner had everything built switched on, the conversation store included, and the server has served with it since. It serves `PP3KIT11-over-cut` from 2026-11-24 with twenty adopted lines: the eleven switches below plus the store, the lean stage hand-off, padding-free expert records, the mHC kernel and their settings. The repository's [fifth release](https://github.com/ProprietaryLegal/Volta-12X-AmPLIfy-DeepSeek-V4.1-Flash-1017-NVFP4-12xV100-SXM2-PP3xTP4#readme) gives what serves now, its measured speeds and the levers closed since.
+
 | Change | Gave | Cost | Answers |
 |---|---|---|---|
 | A third pipeline stage on the fast engine | every one of the 15,360 routed experts at NVFP4 precision in card memory; first divergence from an all-native reference after a median of 208 tokens | a third stage does not make one request faster: 128 tok/s | rounding: measured by closeness |
